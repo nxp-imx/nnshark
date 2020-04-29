@@ -8,29 +8,42 @@ logging_period = 0.1
 cpu_num = 8
 
 ts = 0
+
+cpu_data = []
+element_data = {}
+pad_data = {}
+
 element_name = []
-eval_dic = {"cpuusage" : [], "proctime" : [], "queuelevel" : [], "maxqueue" : [], "bufrate" : []}
+# eval_dic = {"cpuusage" : [], "proctime" : [], "queuelevel" : [], "maxqueue" : [], "bufrate" : []}
 
 def parse_log_file():
     metadata_file = args.dir + "/log_metadata"
     log_file = args.dir + "/log"
-
-    prev_cpuusage = np.zeros(cpu_num)
-    prev_proctime = []
-    prev_queuelevel = []
-    prev_maxqueue = []
-    prev_bufrate = []
 
     with open(metadata_file, "r") as f:
         ts = float(f.readline())
         for i in f.readlines():
             element_name.append(i.split(" ")[1].split("\n")[0])
 
+    for i in range(cpu_num):
+        cpu_data.append([])
+    
+    prev_cpuusage = np.zeros(cpu_num)
+    prev_proctime = np.zeros(len(element_name))
+    prev_queuelevel = np.zeros(len(element_name))
+    prev_maxqueue = np.zeros(len(element_name))
+    prev_bufrate = np.zeros(len(element_name))
+
     for i in range(len(element_name)):
-        prev_proctime.append(0)
-        prev_queuelevel.append(0)
-        prev_maxqueue.append(0)
-        prev_bufrate.append(0)
+        # Add -1 for Enable value (element don't need bufrate)
+        if(len(element_name[i].split("-")) == 1):
+            element_data[i] = {"proctime" : [], "queuelevel" : [], "maxqueue" : []}
+            prev_bufrate[i] = -1
+        else:
+            pad_data[i] = {"bufrate" : []}
+            prev_proctime[i] = -1
+            prev_queuelevel[i] = -1
+            prev_maxqueue[i] = -1
     
     with open(log_file, "r") as f:
         data = f.readlines()
@@ -44,16 +57,21 @@ def parse_log_file():
         for i in range(idx, len(data)):
             parsed_data = data[i].split("\n")[0].split(" ")
 
-            # print(parsed_data)
-
             # Next data
-            # Need deep copy for prev data
             if(parsed_data[0] == "t"):
-                eval_dic["cpuusage"].append(copy.deepcopy(prev_cpuusage))
-                eval_dic["proctime"].append(copy.deepcopy(prev_proctime))
-                eval_dic["queuelevel"].append(copy.deepcopy(prev_queuelevel))
-                eval_dic["maxqueue"].append(copy.deepcopy(prev_maxqueue))
-                eval_dic["bufrate"].append(copy.deepcopy(prev_bufrate))
+                for i in range(cpu_num):
+                    cpu_data[i].append(prev_cpuusage[i])
+
+                for i in range(len(element_name)):
+                    if(prev_proctime[i] != -1):
+                        element_data[i]["proctime"].append(prev_proctime[i])
+                    if(prev_queuelevel[i] != -1):
+                        element_data[i]["queuelevel"].append(prev_queuelevel[i])
+                    if(prev_maxqueue[i] != -1):
+                        element_data[i]["maxqueue"].append(prev_maxqueue[i])
+                    if(prev_bufrate[i] != -1):
+                        pad_data[i]["bufrate"].append(prev_bufrate[i])
+
             # CPU Usage data
             elif(parsed_data[0] == "c"):
                 for i in range(cpu_num):
@@ -69,21 +87,21 @@ def parse_log_file():
                     prev_queuelevel[int(parsed_data[0])] += int(parsed_data[2])
                 if(parsed_data[3] != '.'):
                     prev_maxqueue[int(parsed_data[0])] += int(parsed_data[3])
-            # print(eval_dic)
 
         # append last data
-        eval_dic["cpuusage"].append(copy.deepcopy(prev_cpuusage))
-        eval_dic["proctime"].append(copy.deepcopy(prev_proctime))
-        eval_dic["queuelevel"].append(copy.deepcopy(prev_queuelevel))
-        eval_dic["maxqueue"].append(copy.deepcopy(prev_maxqueue))
-        eval_dic["bufrate"].append(copy.deepcopy(prev_bufrate))
 
-    print(eval_dic["cpuusage"])
-    # print(len(eval_dic["cpuusage"]))
-    # print(len(eval_dic["proctime"]))
-    # print(len(eval_dic["queuelevel"]))
-    # print(len(eval_dic["maxqueue"]))
-    # print(len(eval_dic["bufrate"]))
+        for i in range(cpu_num):
+            cpu_data[i].append(prev_cpuusage[i])
+
+        for i in range(len(element_name)):
+            if(prev_proctime[i] != -1):
+                element_data[i]["proctime"].append(prev_proctime[i])
+            if(prev_queuelevel[i] != -1):
+                element_data[i]["queuelevel"].append(prev_queuelevel[i])
+            if(prev_maxqueue[i] != -1):
+                element_data[i]["maxqueue"].append(prev_maxqueue[i])
+            if(prev_bufrate[i] != -1):
+                pad_data[i]["bufrate"].append(prev_bufrate[i])
 
 def visualize():
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -124,4 +142,4 @@ if __name__ == "__main__":
         exit(1)
 
     parse_log_file()
-    visualize()
+    # visualize()
