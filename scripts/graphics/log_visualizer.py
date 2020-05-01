@@ -14,8 +14,6 @@ element_data = {}
 pad_data = {}
 
 element_name = []
-# eval_dic = {"cpuusage" : [], "proctime" : [], "queuelevel" : [], "maxqueue" : [], "bufrate" : []}
-
 def parse_log_file():
     metadata_file = args.dir + "/log_metadata"
     log_file = args.dir + "/log"
@@ -104,23 +102,46 @@ def parse_log_file():
                 pad_data[i]["bufrate"].append(prev_bufrate[i])
 
 def visualize():
-    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    x = np.arange(len(cpu_data[0]))
 
+    config = dict({'scrollZoom': True})
+
+    # For CPU Usage
     fig = go.Figure()
+    for i in range(len(cpu_data)):
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=cpu_data[i],
+            name = 'CPU ' + str(i),
+            connectgaps=True
+        ))
 
-    fig.add_trace(go.Scatter(
-        x=x,
-        y=[10, 20, None, 15, 10, 5, 15, None, 20, 10, 10, 15, 25, 20, 10],
-        name = '<b>No</b> Gaps', # Style name/legend entry with html tags
-        connectgaps=True # override default to connect the gaps
-    ))
-    fig.add_trace(go.Scatter(
-        x=x,
-        y=[5, 15, None, 10, 5, 0, 10, None, 15, 5, 5, 10, 20, 15, 5],
-        name='Gaps',
-    ))
+    # fig.show(config=config)
 
-    fig.show()
+    # For proctime
+    fig = go.Figure()
+    for idx in element_data:
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=element_data[idx]["proctime"],
+            name = element_name[idx],
+            connectgaps=True
+        ))
+
+    # fig.show(config=config)
+
+    # For bufrate
+    fig = go.Figure()
+    for idx in pad_data:
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=pad_data[idx]["bufrate"],
+            name = element_name[idx],
+            connectgaps=True
+        ))
+        
+    fig.show(config=config)
+
 
 if __name__ == "__main__":
     # Parse argument
@@ -142,4 +163,4 @@ if __name__ == "__main__":
         exit(1)
 
     parse_log_file()
-    # visualize()
+    visualize()
