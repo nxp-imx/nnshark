@@ -177,20 +177,41 @@ update_cpuusage_event (guint32 cpunum, gfloat * cpuload)
 void
 update_proctime (ElementUnit * element, ElementUnit * peerElement, guint64 ts)
 {
-  if (peerElement->is_filter) {
-    peerElement->time = ts;
-  }
-
+  guint64 delta;
   if (element->is_filter) {
-    if (ts - element->time > 0) {
-      avg_update_value (element->proctime, ts - element->time);
-    }
+    // element pushed buffer
+    delta = time_pop_value (element->time_log, ts)
+        avg_update_value (element->proctime, delta);
   }
+  if (peerElement->is_filter) {
+    // element pulled buffer
+    time_push_value (peerElement->time_log, ts);
+  }
+//   if (peerElement->is_filter) {
+//     peerElement->time = ts;
+//   }
+
+//   if (element->is_filter) {
+//     if (ts - element->time > 0) {
+//       avg_update_value (element->proctime, ts - element->time);
+//     }
+//   }
 }
 
 void
 update_datatrate (PadUnit * pad, PadUnit * peerPad, guint64 ts)
 {
+  // guint64 prev_ts = pad->time;
+  // gdouble rate;
+
+  // if (ts > prev_ts) {
+  //   rate = 1e9 / (ts - prev_ts);
+  //   pad->datarate = rate;
+  //   peerPad->datarate = rate;
+  // }
+  // pad->time = ts;
+  // peerPad->time = ts;
+
   guint length = g_queue_get_length (pad->time_log);
   gdouble datarate;
   guint64 *pTime;

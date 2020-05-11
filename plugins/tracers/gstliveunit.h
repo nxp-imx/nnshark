@@ -4,9 +4,15 @@
 #include <gst/gst.h>
 
 G_BEGIN_DECLS typedef struct _AvgUnit AvgUnit;
+typedef struct _TimeUnit TimeUnit;
 typedef struct _ElementUnit ElementUnit;
 typedef struct _PadUnit PadUnit;
 typedef struct _LogUnit LogUnit;
+
+struct _TimeUnit
+{
+  GQueue *time_log;
+};
 
 struct _AvgUnit
 {
@@ -23,12 +29,13 @@ struct _ElementUnit
 	guint64 time;
 
 	AvgUnit * proctime;
+  TimeUnit * time_log; // On testing
 
   guint32 elem_idx; // for log metadata
 	
 	gboolean is_filter;
   gboolean is_queue;
-  
+
 	guint32 queue_level;
 	guint32 max_queue_level;
 };
@@ -56,6 +63,10 @@ struct _LogUnit
 
 void avg_update_value (AvgUnit * unit, guint64 value);
 AvgUnit *avg_unit_new (void);
+TimeUnit * time_unit_new (void);
+
+void time_push_value (TimeUnit * unit, guint64 ts);
+guint64 time_pop_value (TimeUnit * unit, guint64 ts);
 ElementUnit *element_unit_new (void);
 
 PadUnit *pad_unit_new (void);
