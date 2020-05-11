@@ -240,7 +240,7 @@ update_queue_level (ElementUnit * element)
 
 void
 element_push_buffer_pre (gchar * elementname, gchar * padname, guint64 ts,
-    guint64 buffer_size)
+    GstBuffer * buffer)
 {
   GHashTable *elements = packet->elements;
   ElementUnit *pElement, *pPeerElement;
@@ -260,7 +260,7 @@ element_push_buffer_pre (gchar * elementname, gchar * padname, guint64 ts,
 
   update_proctime (pElement, pPeerElement, ts);
   update_datatrate (pPad, pPeerPad, ts);
-  update_buffer_size (pPad, pPeerPad, buffer_size);
+  update_buffer_size (pPad, pPeerPad, gst_buffer_get_size (buffer));
   update_queue_level (pElement);
 }
 
