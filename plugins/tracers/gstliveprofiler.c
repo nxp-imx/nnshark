@@ -117,6 +117,7 @@ add_children_recursively (GstElement * element, GHashTable * table)
     eUnit->element = element;
     eUnit->pad = g_hash_table_new (g_str_hash, g_str_equal);
     eUnit->is_filter = is_filter (element);
+    eUnit->is_queue = is_queue (element);
 
     children = GST_ELEMENT_PADS (element);
     iter = g_list_first (children);
@@ -227,7 +228,7 @@ update_queue_level (ElementUnit * element)
   GstElement *pElement = element->element;
   guint32 size_buffers;
   guint32 max_size_buffers;
-  if (!is_queue (pElement)) {
+  if (!element->is_queue) {
     return;
   }
 

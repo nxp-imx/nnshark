@@ -27,6 +27,8 @@ struct _ElementUnit
   guint32 elem_idx; // for log metadata
 	
 	gboolean is_filter;
+  gboolean is_queue;
+  
 	guint32 queue_level;
 	guint32 max_queue_level;
 };
