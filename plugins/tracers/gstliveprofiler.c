@@ -180,8 +180,8 @@ update_proctime (ElementUnit * element, ElementUnit * peerElement, guint64 ts)
   guint64 delta;
   if (element->is_filter) {
     // element pushed buffer
-    delta = time_pop_value (element->time_log, ts)
-        avg_update_value (element->proctime, delta);
+    delta = time_pop_value (element->time_log, ts);
+    avg_update_value (element->proctime, delta);
   }
   if (peerElement->is_filter) {
     // element pulled buffer
