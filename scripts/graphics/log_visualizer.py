@@ -110,35 +110,68 @@ def visualize():
     fig = go.Figure()
     for i in range(len(cpu_data)):
         fig.add_trace(go.Scatter(
-            x=x,
+            x=x/10,
             y=cpu_data[i],
             name = 'CPU ' + str(i),
             connectgaps=True
         ))
 
-    # fig.show(config=config)
+    fig.update_layout(
+        title="CPU Usage",
+        xaxis_title="time (s)",
+        yaxis_title="CPU Usage (%)",
+        font=dict(
+            family="Courier New, monospace",
+            size=18,
+            color="#7f7f7f"
+        )
+    )
+
+    fig.show(config=config)
 
     # For proctime
     fig = go.Figure()
     for idx in element_data:
         fig.add_trace(go.Scatter(
-            x=x,
+            x=x/10,
             y=element_data[idx]["proctime"],
             name = element_name[idx],
             connectgaps=True
         ))
 
-    # fig.show(config=config)
+    fig.update_layout(
+        title="proctime",
+        xaxis_title="time (s)",
+        yaxis_title="proctime (ns)",
+        font=dict(
+            family="Courier New, monospace",
+            size=18,
+            color="#7f7f7f"
+        )
+    )
+
+    fig.show(config=config)
 
     # For bufrate
     fig = go.Figure()
     for idx in pad_data:
         fig.add_trace(go.Scatter(
-            x=x,
+            x=x/10,
             y=pad_data[idx]["bufrate"],
             name = element_name[idx],
             connectgaps=True
         ))
+
+    fig.update_layout(
+        title="buftate",
+        xaxis_title="time (s)",
+        yaxis_title="bufrate (s)",
+        font=dict(
+            family="Courier New, monospace",
+            size=18,
+            color="#7f7f7f"
+        )
+    )
         
     fig.show(config=config)
 
