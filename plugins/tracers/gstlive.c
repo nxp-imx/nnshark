@@ -37,6 +37,9 @@ GST_DEBUG_CATEGORY_STATIC (gst_live_debug);
 #define GST_CAT_DEFAULT gst_live_debug
 GST_DEBUG_CATEGORY_STATIC (GST_CAT_STATES);
 
+extern long initial_tv_sec;
+extern long initial_tv_usec;
+
 struct _GstLiveTracer
 {
   GstTracer parent;
@@ -95,6 +98,25 @@ do_pad_push_pre (GstTracer * self, guint64 ts, GstPad * pad, GstBuffer * buffer)
 {
   gchar *element_name = GST_OBJECT_NAME (GST_OBJECT_PARENT (pad));
   gchar *pad_name = GST_OBJECT_NAME (pad);
+
+  if (g_getenv ("LOG_ENABLED")) {
+    char file_name[50];
+    char text[50];
+    sprintf (file_name, "buffer-%s-%s", element_name, pad_name);
+    struct timeval current_time;
+    gettimeofday (&current_time, NULL);
+
+    // save time_diff for 0.0001s unit
+    long time_diff = current_time.tv_sec - initial_tv_sec;
+    long time_diff_usec = current_time.tv_usec - initial_tv_usec;
+    if (time_diff_usec < 0) {
+      time_diff_usec += 1000000;
+    }
+
+    sprintf (text, "%d.%d %d", time_diff, time_diff_usec, buffer->offset);
+    do_print_log (file_name, text);
+  }
+
   element_push_buffer_pre (element_name, pad_name, ts,
       gst_buffer_get_size (buffer));
 }

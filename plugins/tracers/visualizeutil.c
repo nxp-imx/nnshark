@@ -21,6 +21,10 @@ milsleep (int ms)
   nanosleep (&ts, NULL);
 }
 
+// for saving initial timestamp;
+long initial_tv_sec;
+long initial_tv_usec;
+
 // NCurses location
 int row_current = 0;
 int col_current = 0;
@@ -367,6 +371,8 @@ curses_loop (void *arg)
     char text[30];
     sprintf (text, "%ld.%ld", startTime.tv_sec, startTime.tv_usec / 1000);
     do_print_log ("log_metadata", text);
+    initial_tv_sec = startTime.tv_sec;
+    initial_tv_usec = startTime.tv_usec;
   }
 
   while (1) {
