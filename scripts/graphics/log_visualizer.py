@@ -12,8 +12,8 @@ ts = 0
 cpu_data = []
 element_data = {}
 pad_data = {}
-
 element_name = []
+
 def parse_log_file():
     metadata_file = args.dir + "/log_metadata"
     log_file = args.dir + "/log"
@@ -100,6 +100,26 @@ def parse_log_file():
                 element_data[i]["maxqueue"].append(prev_maxqueue[i])
             if(prev_bufrate[i] != -1):
                 pad_data[i]["bufrate"].append(prev_bufrate[i])
+
+def parse_log_buffer_file():
+    # metadata_file = args.dir + "/log_metadata"
+
+    # with open(metadata_file, "r") as f:
+    #     ts = float(f.readline())
+    #     for i in f.readlines():
+    #         element_name.append(i.split(" ")[1].split("\n")[0])
+
+    pad_num = ["hi", "bye", "byebye", "fifif"]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        y=pad_num,
+        x=[1, 4, 9, 16],
+        base=[0, 3, 5, 10],
+        orientation='h'
+    ))
+
+    fig.update_layout(hovermode='x unified')
+    fig.show()
 
 def visualize():
     x = np.arange(len(cpu_data[0]))
@@ -195,5 +215,6 @@ if __name__ == "__main__":
         print("No log metadata file in your directory")
         exit(1)
 
-    parse_log_file()
-    visualize()
+    # parse_log_file()
+    parse_log_buffer_file()
+    # visualize()
