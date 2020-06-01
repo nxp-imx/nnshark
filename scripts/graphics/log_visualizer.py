@@ -14,6 +14,9 @@ element_data = {}
 pad_data = {}
 element_name = []
 
+buffer_timeline_y = []
+buffer_timeline_data = {}
+
 def parse_log_file():
     metadata_file = args.dir + "/log_metadata"
     log_file = args.dir + "/log"
@@ -102,23 +105,38 @@ def parse_log_file():
                 pad_data[i]["bufrate"].append(prev_bufrate[i])
 
 def parse_log_buffer_file():
-    # metadata_file = args.dir + "/log_metadata"
+    # find buffer files
+    for idx, name in enumerate(element_name):
+        buffer_file_path = args.dir + "/buffer-" + name
 
-    # with open(metadata_file, "r") as f:
-    #     ts = float(f.readline())
-    #     for i in f.readlines():
-    #         element_name.append(i.split(" ")[1].split("\n")[0])
+        if(os.path.exists(buffer_file_path)):
+            buffer_timeline_y.append(name)
 
-    pad_num = ["hi", "bye", "byebye", "fifif"]
+            with open(buffer_file_path, "r") as f:
+                wholeFile = f.readlines()
+                for i in range(len(wholeFile)-1):
+                    current_ts = float(wholeFile[i].split(" ")[0])
+                    next_ts = float(wholeFile[i+1].split(" ")[0])
+                    buffer_offset = wholeFile[i].split(" ")[1].split("\n")[0]
+
+                    if not buffer_timeline_data.get(buffer_offset):
+                        buffer_timeline_data[buffer_offset] = {"pad_name" : [], "base" : [], "len" : []}
+
+                    buffer_timeline_data[buffer_offset]["pad_name"].append(name)
+                    buffer_timeline_data[buffer_offset]["base"].append(round(current_ts, 4))
+                    buffer_timeline_data[buffer_offset]["len"].append(round(next_ts - current_ts, 4))
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        y=pad_num,
-        x=[1, 4, 9, 16],
-        base=[0, 3, 5, 10],
-        orientation='h'
-    ))
-
-    fig.update_layout(hovermode='x unified')
+    for buffer_idx in buffer_timeline_data:
+        # print(buffer_timeline_data[buffer_idx])
+        fig.add_trace(go.Bar(
+            y=buffer_timeline_data[buffer_idx]["pad_name"],
+            x=buffer_timeline_data[buffer_idx]["len"],
+            base=buffer_timeline_data[buffer_idx]["base"],
+            orientation='h'
+        ))
+    
+    fig.update_layout(barmode='stack')
     fig.show()
 
 def visualize():
@@ -215,6 +233,6 @@ if __name__ == "__main__":
         print("No log metadata file in your directory")
         exit(1)
 
-    # parse_log_file()
+    parse_log_file()
     parse_log_buffer_file()
     # visualize()
