@@ -3,6 +3,7 @@ import os
 import plotly.graph_objects as go
 import copy
 import numpy as np
+from plotly.subplots import make_subplots
 
 logging_period = 0.1
 cpu_num = 8
@@ -126,38 +127,37 @@ def parse_log_buffer_file():
                     buffer_timeline_data[buffer_offset]["base"].append(round(current_ts, 4))
                     buffer_timeline_data[buffer_offset]["len"].append(round(next_ts - current_ts, 4))
 
-    fig = go.Figure()
-    for buffer_idx in buffer_timeline_data:
-        # print(buffer_timeline_data[buffer_idx])
-        fig.add_trace(go.Bar(
-            y=buffer_timeline_data[buffer_idx]["pad_name"],
-            x=buffer_timeline_data[buffer_idx]["len"],
-            base=buffer_timeline_data[buffer_idx]["base"],
-            orientation='h'
-        ))
-    
-    fig.update_layout(barmode='stack')
-    fig.show()
-
 def visualize():
     x = np.arange(len(cpu_data[0]))
 
     config = dict({'scrollZoom': True})
 
-    # For CPU Usage
-    fig = go.Figure()
+    ### CPU Usage Plot
+    # CPU plot
+    fig = make_subplots(rows=2, cols=1)
     for i in range(len(cpu_data)):
         fig.add_trace(go.Scatter(
             x=x/10,
             y=cpu_data[i],
             name = 'CPU ' + str(i),
             connectgaps=True
-        ))
+        ), row=1, col=1)
+
+    # buffer timeline plot
+    for buffer_idx in buffer_timeline_data:
+        fig.add_trace(go.Bar(
+            y=buffer_timeline_data[buffer_idx]["pad_name"],
+            x=buffer_timeline_data[buffer_idx]["len"],
+            base=buffer_timeline_data[buffer_idx]["base"],
+            orientation='h',
+            showlegend=False
+        ), row=2, col=1)
 
     fig.update_layout(
         title="CPU Usage",
         xaxis_title="time (s)",
         yaxis_title="CPU Usage (%)",
+        barmode='stack',
         font=dict(
             family="Courier New, monospace",
             size=18,
@@ -165,53 +165,81 @@ def visualize():
         )
     )
 
+    fig.update_xaxes(range=[0, len(cpu_data[0])/10], row=2, col=1)
+
     fig.show(config=config)
 
-    # For proctime
-    fig = go.Figure()
+    ### Process Time Plot
+    # proctime plot
+    fig2 = make_subplots(rows=2, cols=1)
     for idx in element_data:
-        fig.add_trace(go.Scatter(
+        fig2.add_trace(go.Scatter(
             x=x/10,
             y=element_data[idx]["proctime"],
             name = element_name[idx],
             connectgaps=True
-        ))
+        ), row=1, col=1)
 
-    fig.update_layout(
+    # buffer timeline plot
+    for buffer_idx in buffer_timeline_data:
+        fig2.add_trace(go.Bar(
+            y=buffer_timeline_data[buffer_idx]["pad_name"],
+            x=buffer_timeline_data[buffer_idx]["len"],
+            base=buffer_timeline_data[buffer_idx]["base"],
+            orientation='h',
+            showlegend=False
+        ), row=2, col=1)
+
+    fig2.update_layout(
         title="proctime",
         xaxis_title="time (s)",
         yaxis_title="proctime (ns)",
+        barmode='stack',
         font=dict(
             family="Courier New, monospace",
             size=18,
             color="#7f7f7f"
         )
     )
+    fig2.update_xaxes(range=[0, len(cpu_data[0])/10], row=2, col=1)
 
-    fig.show(config=config)
+    fig2.show(config=config)
 
-    # For bufrate
-    fig = go.Figure()
+    ### Bufrate Plot
+    # bufrate plot
+    fig3 = make_subplots(rows=2, cols=1)
     for idx in pad_data:
-        fig.add_trace(go.Scatter(
+        fig3.add_trace(go.Scatter(
             x=x/10,
             y=pad_data[idx]["bufrate"],
             name = element_name[idx],
             connectgaps=True
-        ))
+        ), row=1, col=1)
 
-    fig.update_layout(
-        title="buftate",
+    # buffer timeline plot
+    for buffer_idx in buffer_timeline_data:
+        fig3.add_trace(go.Bar(
+            y=buffer_timeline_data[buffer_idx]["pad_name"],
+            x=buffer_timeline_data[buffer_idx]["len"],
+            base=buffer_timeline_data[buffer_idx]["base"],
+            orientation='h',
+            showlegend=False
+        ), row=2, col=1)
+
+    fig3.update_layout(
+        title="Buftate",
         xaxis_title="time (s)",
         yaxis_title="bufrate (s)",
+        barmode='stack',
         font=dict(
             family="Courier New, monospace",
             size=18,
             color="#7f7f7f"
         )
     )
+    fig3.update_xaxes(range=[0, len(cpu_data[0])/10], row=2, col=1)
         
-    fig.show(config=config)
+    fig3.show(config=config)
 
 
 if __name__ == "__main__":
@@ -235,4 +263,4 @@ if __name__ == "__main__":
 
     parse_log_file()
     parse_log_buffer_file()
-    # visualize()
+    visualize()
