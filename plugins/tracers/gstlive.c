@@ -44,7 +44,7 @@ struct _GstLiveTracer
 {
   GstTracer parent;
   GstCPUUsage cpu_usage;
-  guint16 event_id;
+  gboolean event_running;
 };
 
 #define _do_init \
@@ -63,13 +63,14 @@ do_periodic (GObject * obj)
   GstCPUUsage *cpu_usage;
   gfloat *cpu_load;
   gint cpu_load_len;
+  static guint counter = 0;
 
   cpu_usage = &self->cpu_usage;
 
   cpu_load = CPU_USAGE_ARRAY (cpu_usage);
   cpu_load_len = CPU_USAGE_ARRAY_LENGTH (cpu_usage);
 
-  cpu_usage->cpu_array_sel = FALSE;
+  //cpu_usage->cpu_array_sel = FALSE;
   gst_cpu_usage_compute (cpu_usage);
 
   update_cpuusage_event (cpu_load_len, cpu_load);
@@ -87,9 +88,12 @@ do_element_change_state_post (GObject * self, guint64 ts,
   if (GST_IS_PIPELINE (element)
       && (transition == GST_STATE_CHANGE_PAUSED_TO_PLAYING)) {
     update_pipeline_init ((GstPipeline *) element);
-    gst_cpu_usage_init (&(tracer->cpu_usage));
-    tracer->event_id = g_timeout_add_seconds (PERIODIC_INTERVAL,
-        (GSourceFunc) do_periodic, (gpointer) tracer);
+    if (!tracer->event_running) {
+      gst_cpu_usage_init (&(tracer->cpu_usage));
+      g_timeout_add_seconds (PERIODIC_INTERVAL,
+          (GSourceFunc) do_periodic, (gpointer) tracer);
+      tracer->event_running = TRUE;
+    }
   }
 }
 
@@ -170,6 +174,7 @@ static void
 gst_live_tracer_finalize (GObject * obj)
 {
   g_unsetenv ("LIVEPROFILER_ENABLED");
+  gst_liveprofiler_finalize ();
   G_OBJECT_CLASS (gst_live_tracer_parent_class)->finalize (obj);
 }
 
@@ -177,7 +182,6 @@ static void
 gst_live_tracer_class_init (GstLiveTracerClass * klass)
 {
   GObjectClass *g_obj_class = G_OBJECT_CLASS (klass);
-  printf ("BAAAAAAAM\n");
 
   gst_liveprofiler_init ();
   g_setenv ("LIVEPROFILER_ENABLED", "TRUE", TRUE);
@@ -193,6 +197,7 @@ gst_live_tracer_init (GstLiveTracer * self)
   cpu_usage = &self->cpu_usage;
   gst_cpu_usage_init (cpu_usage);
   cpu_usage->cpu_array_sel = FALSE;
+  self->event_running = FALSE;
 
   gst_tracing_register_hook (tracer, "element-change-state-post",
       G_CALLBACK (do_element_change_state_post));
