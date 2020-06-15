@@ -110,10 +110,11 @@ do_pad_push_pre (GstTracer * self, guint64 ts, GstPad * pad, GstBuffer * buffer)
     long time_diff = current_time.tv_sec - initial_tv_sec;
     long time_diff_usec = current_time.tv_usec - initial_tv_usec;
     if (time_diff_usec < 0) {
+      time_diff -= 1;
       time_diff_usec += 1000000;
     }
 
-    sprintf (text, "%d.%d %d", time_diff, time_diff_usec, buffer->offset);
+    sprintf (text, "%d.%06d %d", time_diff, time_diff_usec, buffer->offset);
     do_print_log (file_name, text);
   }
 
