@@ -461,7 +461,9 @@ curses_loop (void *arg)
   GList *element_key = NULL;
   GList *pad_key = NULL;
 
-  printf ("DONE INITIALIZE\n");
+  while (!packet->loaded)
+    milsleep (1);
+
   initialize ();
 
   if (g_getenv ("LOG_ENABLED")) {
@@ -495,7 +497,7 @@ curses_loop (void *arg)
     if (key_in == 'q' || key_in == 'Q')
       break;
 
-    switch (key_in) {           //key value
+    switch (key_in) {
       case 259:                //arrow right
         if (selection_mode == PAD_SELECTION) {
           if (g_list_next (padIterator)) {
@@ -570,7 +572,8 @@ curses_loop (void *arg)
 
     print_data (key_in, packet);
 
-    g_hash_table_foreach (packet->elements, (GHFunc) print_element, NULL);
+    if (packet->loaded)
+      g_hash_table_foreach (packet->elements, (GHFunc) print_element, NULL);
 
     draw_all (element, DRAW_START_ROW, DRAW_START_COL, DRAW_WIDTH,
         DRAW_HEIGHT, DRAW_ELE_WIDTH, DRAW_ARROW_WIDTH);

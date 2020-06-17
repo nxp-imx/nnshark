@@ -9,6 +9,7 @@ void print_connection (gpointer key, gpointer value, gpointer user_data);
 
 void update_cpuusage_event (guint32 cpunum, gfloat * cpuload);
 void update_pipeline_init (GstPipeline * element);
+void update_pipeline_finalize (GstPipeline * element);
 
 void update_proctime (ElementUnit * element, ElementUnit * peerElement,
     guint64 ts);

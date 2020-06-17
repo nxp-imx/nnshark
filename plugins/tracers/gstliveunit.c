@@ -156,6 +156,7 @@ packet_new (int cpu_num)
   packet->cpu_load = g_malloc0 (sizeof (gfloat) * cpu_num);
   packet->elements =
       g_hash_table_new_full (g_str_hash, g_str_equal, NULL, element_unit_free);
+  packet->loaded = FALSE;
 
   return packet;
 }
