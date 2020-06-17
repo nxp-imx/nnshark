@@ -37,7 +37,7 @@ $ GST_DEBUG="GST_TRACER:7" GST_TRACERS="live"\
 ```
 
 ## How To Use Log Visualizer
-You should know directory which have log (default is /nnstreamer/bin)
+You should know directory which have log (default path is `/nnstreamer/bin/gstshark_<timestamp>`)
 ```
 python3 scripts/graphics/log_visualizer.py --dir=<log directory>
 ```
