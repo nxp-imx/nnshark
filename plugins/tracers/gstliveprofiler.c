@@ -85,6 +85,7 @@ gboolean
 gst_liveprofiler_init (void)
 {
   gint cpu_num;
+  pthread_t thread;
 
   if ((cpu_num = sysconf (_SC_NPROCESSORS_CONF)) == -1) {
     GST_WARNING ("Failed to get numbers of cpus");
@@ -94,7 +95,6 @@ gst_liveprofiler_init (void)
   packet = packet_new (cpu_num);
 
 #ifndef _DEBUG_TRUE
-  pthread_t thread;
   pthread_create (&thread, NULL, curses_loop, packet);
   pthread_detach (thread);
 #endif
@@ -194,6 +194,9 @@ element_push_buffer_pre (gchar * elementname, gchar * padname, guint64 ts,
   printf ("[%ld]%s-%s pre\n", ts, elementname, padname);
 #endif
 
+  if (!packet->loaded)
+    return;
+
   pElement = g_hash_table_lookup (elements, elementname);
   g_return_if_fail (pElement);
   pPad = g_hash_table_lookup (pElement->pad, padname);
@@ -257,4 +260,11 @@ update_pipeline_init (GstPipeline * element)
     g_hash_table_foreach (packet->elements, (GHFunc) generate_meta_data, NULL);
     metadata_writed = log_idx;
   }
+  packet->loaded = TRUE;
+}
+
+void
+update_pipeline_finalize (GstPipeline * element)
+{
+  packet->loaded = FALSE;
 }

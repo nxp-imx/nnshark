@@ -23,7 +23,7 @@ struct _ElementUnit
 
   guint64 time;
 
-  AvgUnit *proctime;  
+  AvgUnit *proctime;
   guint32 queue_level;
   guint32 max_queue_level;
 
@@ -59,6 +59,7 @@ struct _Packet
   gint cpu_num;
   gfloat *cpu_load;
   GHashTable *elements;
+  gboolean loaded;
 };
 
 gboolean is_filter (GstElement * element);

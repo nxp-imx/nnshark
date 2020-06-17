@@ -85,8 +85,12 @@ do_element_change_state_post (GObject * self, guint64 ts,
 {
   GstLiveTracer *tracer = GST_LIVE_TRACER (self);
 
-  if (GST_IS_PIPELINE (element)
-      && (transition == GST_STATE_CHANGE_PAUSED_TO_PLAYING)) {
+  if (FALSE == GST_IS_PIPELINE (element)) {
+    return;
+  }
+
+  if (transition == GST_STATE_CHANGE_PAUSED_TO_PLAYING
+      && result == GST_STATE_CHANGE_SUCCESS) {
     update_pipeline_init ((GstPipeline *) element);
     if (!tracer->event_running) {
       gst_cpu_usage_init (&(tracer->cpu_usage));
@@ -94,6 +98,9 @@ do_element_change_state_post (GObject * self, guint64 ts,
           (GSourceFunc) do_periodic, (gpointer) tracer);
       tracer->event_running = TRUE;
     }
+  } else if (transition == GST_STATE_CHANGE_PLAYING_TO_PAUSED) {
+    update_pipeline_finalize ((GstPipeline *) element);
+    tracer->event_running = FALSE;
   }
 }
 
