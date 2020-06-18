@@ -23,9 +23,10 @@ generate_meta_data_pad (gpointer key, gpointer value, gpointer user_data)
   gchar *pad_name = (gchar *) key;
   PadUnit *data = (PadUnit *) value;
   gchar *element_name = (gchar *) user_data;
+  char text[50];
 
   data->elem_idx = log_idx;
-  char text[50];
+
   sprintf (text, "%d %s-%s", log_idx, element_name, pad_name);
   do_print_log ("log_metadata", text);
   log_idx++;
@@ -36,10 +37,10 @@ generate_meta_data (gpointer key, gpointer value, gpointer user_data)
 {
   gchar *name = (gchar *) key;
   ElementUnit *data = (ElementUnit *) value;
+  char text[50];
 
   data->elem_idx = log_idx;
 
-  char text[50];
   sprintf (text, "%d %s", log_idx++, name);
   do_print_log ("log_metadata", text);
 

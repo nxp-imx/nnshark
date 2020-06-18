@@ -28,7 +28,6 @@ void element_push_buffer_list_post (gchar * elementname, gchar * padname,
 void element_pull_range_pre (gchar * elementname, gchar * padname, guint64 ts);
 void element_pull_range_post (gchar * elementname, gchar * padname, guint64 ts);
 
-gboolean is_filter (GstElement * element);
 void generate_meta_data_pad (gpointer key, gpointer value, gpointer user_data);
 void generate_meta_data (gpointer key, gpointer value, gpointer user_data);
 void add_children_recursively (GstElement * element, GHashTable * table);

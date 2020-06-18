@@ -35,7 +35,7 @@ struct _ElementUnit
 
 struct _PadUnit
 {
-  GstElement *element;
+  GstPad *element;
   GQueue *time_log;
   guint64 time;
 
@@ -63,14 +63,13 @@ struct _Packet
 };
 
 gboolean is_filter (GstElement * element);
-static gboolean is_queue (GstElement * element);
 
 void avg_update_value (AvgUnit * unit, guint64 value);
 AvgUnit *avg_unit_new (void);
 ElementUnit *element_unit_new (GstElement * element);
 gboolean element_unit_free (ElementUnit * element);
 
-PadUnit *pad_unit_new (ElementUnit * element);
+PadUnit *pad_unit_new (GstPad * element);
 gboolean pad_unit_free (PadUnit * element);
 PadUnit *pad_unit_peer (GHashTable * elements, PadUnit * target);
 ElementUnit *pad_unit_parent (GHashTable * elements, PadUnit * target);
