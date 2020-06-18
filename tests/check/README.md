@@ -9,4 +9,9 @@
 make
 ```
 ### Run test
-run `make clean; make coverage` on `tests/check` directory, then program will automatically test the code and make `index.html`(coverage report) in `tests/check/coverage/plugins/tracers/`.
+run 
+```
+mkdir coverage
+make clean; make coverage
+``` 
+on `tests/check` directory, then program will automatically test the code and make `index.html`(coverage report) in `tests/check/coverage/plugins/tracers/`.
