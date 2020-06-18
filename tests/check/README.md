@@ -6,7 +6,7 @@
 * run this script on top directory
 ```
 ./autogen.sh --prefix=/usr/ --libdir=/usr/lib/x86_64-linux-gnu/ --enable-gcov --disable-graphviz
-make clean; make
+make
 ```
 ### Run test
 run `make clean; make coverage` on `tests/check` directory, then program will automatically test the code and make `index.html`(coverage report) in `tests/check/coverage/plugins/tracers/`.
