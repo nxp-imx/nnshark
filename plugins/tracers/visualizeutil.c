@@ -208,7 +208,7 @@ initialize (void)
   noecho ();
 }
 
-inline void
+void
 print_line_absolute (int *row, int *col)
 {
   for (int i = 0; i < 5; i++) {
@@ -218,7 +218,7 @@ print_line_absolute (int *row, int *col)
   (*row)++;
 }
 
-inline void
+void
 print_line (int *row, int *col)
 {
   for (int i = 0; i < 5; i++) {
