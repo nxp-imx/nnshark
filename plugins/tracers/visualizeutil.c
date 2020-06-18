@@ -302,11 +302,10 @@ draw_box (int rows, int cols, int height, int width)
 void
 draw_pad (gpointer key, gpointer value, gpointer user_data)
 {
-  int src_pad_info_col;
-  int sink_pad_info_col;
+  int src_pad_info_col = element_col + element_width + 1;
+  int sink_pad_info_col = element_col - arrow_width - 1;
   PadUnit *data = (PadUnit *) value;;
-  src_pad_info_col = element_col + element_width + 1;
-  sink_pad_info_col = element_col - arrow_width - 1;
+
   if (key == NULL || value == NULL)
     return;
 
