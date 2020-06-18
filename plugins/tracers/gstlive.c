@@ -27,11 +27,13 @@
 
 #include "gstlive.h"
 #include "gstdot.h"
+#include "gstctf.h"
 #include "gstcpuusagecompute.h"
 #include "gstperiodictracer.h"
 #include "gstliveprofiler.h"
 
 #include <stdio.h>
+#include <sys/time.h>
 
 GST_DEBUG_CATEGORY_STATIC (gst_live_debug);
 #define GST_CAT_DEFAULT gst_live_debug
@@ -63,7 +65,6 @@ do_periodic (GObject * obj)
   GstCPUUsage *cpu_usage;
   gfloat *cpu_load;
   gint cpu_load_len;
-  static guint counter = 0;
 
   cpu_usage = &self->cpu_usage;
 
@@ -109,23 +110,25 @@ do_pad_push_pre (GstTracer * self, guint64 ts, GstPad * pad, GstBuffer * buffer)
 {
   gchar *element_name = GST_OBJECT_NAME (GST_OBJECT_PARENT (pad));
   gchar *pad_name = GST_OBJECT_NAME (pad);
+  long time_diff;
+  long time_diff_usec;
 
   if (g_getenv ("LOG_ENABLED")) {
     char file_name[50];
     char text[50];
-    sprintf (file_name, "buffer-%s-%s", element_name, pad_name);
     struct timeval current_time;
+    sprintf (file_name, "buffer-%s-%s", element_name, pad_name);
     gettimeofday (&current_time, NULL);
 
     // save time_diff for 0.0001s unit
-    long time_diff = current_time.tv_sec - initial_tv_sec;
-    long time_diff_usec = current_time.tv_usec - initial_tv_usec;
+    time_diff = current_time.tv_sec - initial_tv_sec;
+    time_diff_usec = current_time.tv_usec - initial_tv_usec;
     if (time_diff_usec < 0) {
       time_diff -= 1;
       time_diff_usec += 1000000;
     }
 
-    sprintf (text, "%d.%06d %d", time_diff, time_diff_usec, buffer->offset);
+    sprintf (text, "%ld.%06ld %ld", time_diff, time_diff_usec, buffer->offset);
     do_print_log (file_name, text);
   }
 

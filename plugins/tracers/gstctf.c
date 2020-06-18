@@ -704,12 +704,15 @@ void
 do_print_log (const char *filename, const char *text)
 {
   /* Lock mem, datastream and output_stream resources */
+  gchar *log_path;
+  FILE *fp;
+
   g_mutex_lock (&ctf_descriptor->mutex);
 
-  gchar *log_path =
+  log_path =
       g_strjoin (G_DIR_SEPARATOR_S, ctf_descriptor->dir_name, filename, NULL);
 
-  FILE *fp = g_fopen (log_path, "a");
+  fp = g_fopen (log_path, "a");
   fprintf (fp, "%s\n", text);
   fclose (fp);
 

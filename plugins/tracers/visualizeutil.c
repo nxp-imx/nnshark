@@ -1,6 +1,6 @@
 #include <ncurses.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include <math.h>
 #include <assert.h>
 
@@ -91,7 +91,7 @@ print_pad (gpointer key, gpointer value, gpointer user_data)
     attroff (A_BOLD);
     attroff (COLOR_PAIR (SELECT_PAD_PAIR));
 
-    pair = gst_pad_get_peer ((GstPad *) data->element);
+    pair = gst_pad_get_peer (data->element);
     pairElement = GST_OBJECT_NAME (GST_OBJECT_PARENT (pair));
     pairPad = GST_OBJECT_NAME (pair);
   } else if (padIterator && *selected == PEER_SELECTED
@@ -212,7 +212,7 @@ initialize (void)
   noecho ();
 }
 
-inline void
+void
 print_line_absolute (int *row, int *col)
 {
   for (int i = 0; i < 5; i++) {
@@ -222,7 +222,7 @@ print_line_absolute (int *row, int *col)
   (*row)++;
 }
 
-inline void
+void
 print_line (int *row, int *col)
 {
   for (int i = 0; i < 5; i++) {
@@ -302,12 +302,12 @@ draw_box (int rows, int cols, int height, int width)
 void
 draw_pad (gpointer key, gpointer value, gpointer user_data)
 {
-  if (key == NULL || value == NULL)
-    return;
   int src_pad_info_col = element_col + element_width + 1;
   int sink_pad_info_col = element_col - arrow_width - 1;
-  gchar *name = (gchar *) key;
-  PadUnit *data = (PadUnit *) value;
+  PadUnit *data = (PadUnit *) value;;
+
+  if (key == NULL || value == NULL)
+    return;
 
   if (padIterator && !strcmp (key, padIterator->data)) {
     attron (A_BOLD);
@@ -343,12 +343,13 @@ draw_pad (gpointer key, gpointer value, gpointer user_data)
 void
 draw_element (gpointer key, gpointer value, gpointer user_data)
 {
-  if (key == NULL || value == NULL)
-    return;
   int element_info_row = element_row + element_height / 2;
   int element_info_col = element_col + element_width / 2 - 10;
   gchar *name = (gchar *) key;
   ElementUnit *data = (ElementUnit *) value;
+
+  if (key == NULL || value == NULL)
+    return;
 
   draw_box (element_row, element_col, element_height, element_width);
   attron (COLOR_PAIR (SELECT_ELEMENT_PAIR));
@@ -376,6 +377,7 @@ print_data (int key_in, Packet * packet)
 {
   time_t tmp_t = time (NULL);
   struct tm tm = *localtime (&tmp_t);
+  int cpu_counter;
   // draw
   clear ();
   mvprintw (row_offset + row_current, 36, "key");       //for debug
@@ -398,14 +400,15 @@ print_data (int key_in, Packet * packet)
   mvprintw (row_offset + row_current++, col_current, "CPU Usage");
   attroff (A_BOLD);
   attroff (COLOR_PAIR (TITLE_PAIR));
-  int i = 0;
-  while (i < packet->cpu_num) {
+
+  cpu_counter = 0;
+  while (cpu_counter < packet->cpu_num) {
     attron (A_BOLD);
-    mvprintw (row_offset + row_current, col_current, "CPU%2d", i);
+    mvprintw (row_offset + row_current, col_current, "CPU%2d", cpu_counter);
     attroff (A_BOLD);
     mvprintw (row_offset + row_current++, col_current + 7 + 4, "%3.1f%%",
-        packet->cpu_load[i]);
-    i++;
+        packet->cpu_load[cpu_counter]);
+    cpu_counter++;
   }
 
   if (g_getenv ("LOG_ENABLED") && cpu_log
@@ -413,9 +416,9 @@ print_data (int key_in, Packet * packet)
     char cpuusage_text[100];
     char *buf = &cpuusage_text[0];
     buf += sprintf (buf, "c ");
-    for (i = 0; i < packet->cpu_num; i++) {
-      cpu_log[i] = packet->cpu_load[i] * 10;
-      buf += sprintf (buf, "%d ", cpu_log[i]);
+    for (cpu_counter = 0; cpu_counter < packet->cpu_num; cpu_counter++) {
+      cpu_log[cpu_counter] = packet->cpu_load[cpu_counter] * 10;
+      buf += sprintf (buf, "%d ", cpu_log[cpu_counter]);
     }
     do_print_log ("log", cpuusage_text);
   }
@@ -460,6 +463,7 @@ curses_loop (void *arg)
   ElementUnit *element = NULL;
   GList *element_key = NULL;
   GList *pad_key = NULL;
+  char *text;
 
   while (!packet->loaded)
     milsleep (1);
@@ -468,7 +472,7 @@ curses_loop (void *arg)
 
   if (g_getenv ("LOG_ENABLED")) {
     gettimeofday (&startTime, NULL);
-    char text[30];
+    text = (char *) g_malloc (30 * sizeof (char));
     sprintf (text, "%ld.%ld", startTime.tv_sec, startTime.tv_usec / 1000);
     do_print_log ("log_metadata", text);
     initial_tv_sec = startTime.tv_sec;

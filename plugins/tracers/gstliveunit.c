@@ -73,7 +73,9 @@ element_unit_new (GstElement * element)
 {
   ElementUnit *e = g_malloc0 (sizeof (ElementUnit));
   e->element = element;
-  e->pad = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, pad_unit_free);
+  e->pad =
+      g_hash_table_new_full (g_str_hash, g_str_equal, NULL,
+      (GDestroyNotify) pad_unit_free);
 
   e->time = 0;
 
@@ -101,7 +103,7 @@ element_unit_free (ElementUnit * element)
  ******************************************************/
 
 PadUnit *
-pad_unit_new (ElementUnit * element)
+pad_unit_new (GstPad * element)
 {
   PadUnit *p = g_malloc0 (sizeof (PadUnit));
 
@@ -121,6 +123,8 @@ pad_unit_free (PadUnit * element)
   g_queue_free_full (element->time_log, g_free);
   g_free (element->buffer_size);
   g_free (element);
+
+  return TRUE;
 }
 
 PadUnit *
@@ -155,7 +159,8 @@ packet_new (int cpu_num)
   packet->cpu_num = cpu_num;
   packet->cpu_load = g_malloc0 (sizeof (gfloat) * cpu_num);
   packet->elements =
-      g_hash_table_new_full (g_str_hash, g_str_equal, NULL, element_unit_free);
+      g_hash_table_new_full (g_str_hash, g_str_equal, NULL,
+      (GDestroyNotify) element_unit_free);
   packet->loaded = FALSE;
 
   return packet;
