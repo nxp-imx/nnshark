@@ -24,7 +24,7 @@ clean-local: clean-local-check
 $(CHECK_REGISTRY):
 	$(AM_TESTS_ENVIRONMENT)
 
-check_PROGRAMS = gstdot
+check_PROGRAMS = gstdot visualizeutil gstliveunit gstliveprofiler
 
 # failing tests
 noinst_PROGRAMS =
@@ -37,7 +37,8 @@ AM_CFLAGS = \
 	$(GST_SHARK_OBJ_CFLAGS) \
 	$(GST_CFLAGS) \
 	$(GST_CHECK_FLAGS) \
-	-I$(top_srcdir)/plugins/tracers 
+	-I$(top_srcdir)/plugins/tracers
+
 LDADD =	\
 	$(top_builddir)/plugins/tracers/libgstshark.la \
 	$(GST_SHARK_OBJ_LIBS) \
@@ -45,7 +46,54 @@ LDADD =	\
 	$(GST_CHECK_LIBS)
 
 gstdot_SOURCES = gst-shark/gstdot.c
+gstliveunit_SOURCES = gst-shark/gstliveunit.c
+gstliveprofiler_SOURCES = gst-shark/gstliveprofiler.c
 
+#gstdot_CFLAGS = \
+# $(AM_CFLAGS)
+
+#gstdot_LDADD = \
+# $(LDADD) 
+
+
+#gstliveunit_LDADD = \
+#  $(LDADD)
+
+visualizeutil_SOURCES = gst-shark/visualizeutil.c
+
+
+visualizeutil_CFLAGS = \
+  $(AM_CFLAGS)
+
+visualizeutil_LDADD = \
+  $(LDADD) \
+  $(top_builddir)/plugins/tracers/libgstshark_la-visualizeutil.lo \
+  ../mocks/mockncurses.o \
+  -lncurses
+
+
+visualizeutil_LDFLAGS = \
+  $(AM_LDFLAGS) \
+  -Wl,--wrap,waddch \
+  -Wl,--wrap,noecho \
+  -Wl,--wrap,wattr_on \
+  -Wl,--wrap,mvprintw \
+  -Wl,--wrap,getch \
+  -Wl,--wrap,wgetch \
+  -Wl,--wrap,endwin \
+  -Wl,--wrap,wattr_off \
+  -Wl,--wrap,wrefresh \
+  -Wl,--wrap,wclear \
+  -Wl,--wrap,wmove \
+  -Wl,--wrap,keypad \
+  -Wl,--wrap,curs_set \
+  -Wl,--wrap,initscr \
+  -Wl,--wrap,raw \
+  -Wl,--wrap,start_color \
+  -Wl,--wrap,init_pair
+
+
+#visualizeutil_SOURCES = gst-shark/visualizeutil.c
 # valgrind testing
 # these just need valgrind fixing, period
 VALGRIND_TO_FIX = 

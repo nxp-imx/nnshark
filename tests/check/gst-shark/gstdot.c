@@ -21,11 +21,12 @@
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif
-
+#include <stdio.h>
 #include <gst/gst.h>
 #include <gst/check/gstcheck.h>
 #include <string.h>
-
+#include <glib.h>
+#include <glib/gstdio.h>
 #include "gstdot.h"
 
 static gboolean
@@ -44,20 +45,23 @@ GST_START_TEST (test_gst_dot)
   GstDotRender render;
   const gchar *dot_string;
   GError *e = NULL;
+  gst_ctf_init ();
 
   pipe = gst_parse_launch ("fakesrc ! fakesink", &e);
   fail_if (!pipe);
   fail_if (e);
-
   dot_string = gst_dot_pipeline_to_string (GST_PIPELINE (pipe));
   fail_if (!dot_string);
 
   render = mock_render;
 
   gst_dot_do_render (dot_string, render, NULL);
+  ck_assert (gst_dot_x11_render (dot_string, NULL));
 }
 
 GST_END_TEST;
+
+
 
 static Suite *
 gst_dot_suite (void)
