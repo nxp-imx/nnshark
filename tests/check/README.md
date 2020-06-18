@@ -1,6 +1,6 @@
 # Running Test Code
 ### Prerequisite
-* You must change `// #define _DEBUG_TRUE` in `plugin/tracers/getliveprofiler.c` to `#define _DEBUG_TRUE`
+* You must change `// #define _DEBUG_TRUE` in `plugin/tracers/gstliveprofiler.c` to `#define _DEBUG_TRUE`
 ### Before running test
 * In `tests/mocks/`, run `gcc -DLINKTIME -c mockncurses.c`
 * run this script on top directory
