@@ -12,13 +12,13 @@ void update_pipeline_init (GstPipeline * element);
 void update_pipeline_finalize (GstPipeline * element);
 
 void update_proctime (ElementUnit * element, ElementUnit * peerElement,
-    guint64 ts);
+    guint64 ts, guint64 offset);
 void update_queue_level (ElementUnit * element);
 void update_datatrate (PadUnit * pad, PadUnit * peerPad, guint64 ts);
 void update_buffer_size (PadUnit * pad, PadUnit * peerPad, guint64 size);
 
 void element_push_buffer_pre (gchar * elementname, gchar * padname, guint64 ts,
-    guint64 buffer_size);
+    GstBuffer * buffer);
 void element_push_buffer_post (gchar * elementname, gchar * padname,
     guint64 ts);
 void element_push_buffer_list_pre (gchar * elementname, gchar * padname,
