@@ -192,10 +192,9 @@ print_element (gpointer key, gpointer value, gpointer user_data)
   }
 
   mvprintw (row_offset + row_current, ELEMENT_NAME_MAX,
-      "%20ld %20.3f %17d/%2d %d",
+      "%20ld %20.3f %17d/%2d",
       data->proctime->value,
-      data->proctime->avg, data->queue_level, data->max_queue_level,
-      row_current - log_base_row);
+      data->proctime->avg, data->queue_level, data->max_queue_level);
   row_current++;
 
   g_hash_table_foreach (data->pad, (GHFunc) print_pad, selected);
