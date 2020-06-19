@@ -73,6 +73,7 @@ gchar *pairElement = NULL;
 extern int metadata_writed;
 int *cpu_log = NULL;
 LogUnit *element_log = NULL;
+int log_base_row = 0;
 
 // Iterator for Hashtable
 void
@@ -109,12 +110,14 @@ print_pad (gpointer key, gpointer value, gpointer user_data)
   if (g_getenv ("LOG_ENABLED") && element_log) {
     char element_log_text[100];
     int new_datarate = (int) (data->datarate * 100);
-    int changed = new_datarate - element_log[row_current - 13].bufrate;
+    int changed =
+        new_datarate - element_log[row_current - log_base_row].bufrate;
 
     if (changed != 0) {
-      sprintf (element_log_text, "p %d %d", row_current - 13, changed);
+      sprintf (element_log_text, "p %d %d", row_current - log_base_row,
+          changed);
       do_print_log ("log", element_log_text);
-      element_log[row_current - 13].bufrate = new_datarate;
+      element_log[row_current - log_base_row].bufrate = new_datarate;
     }
   }
 
@@ -151,23 +154,28 @@ print_element (gpointer key, gpointer value, gpointer user_data)
 
     char element_log_text[100];
     char *buf = &element_log_text[0];
-    if (element_log[row_current - 13].proctime != data->proctime->value) {
+    if (element_log[row_current - log_base_row].proctime !=
+        data->proctime->value) {
       buf +=
           sprintf (buf, "%ld ",
-          data->proctime->value - element_log[row_current - 13].proctime);
-      element_log[row_current - 13].proctime = data->proctime->value;
+          data->proctime->value - element_log[row_current -
+              log_base_row].proctime);
+      element_log[row_current - log_base_row].proctime = data->proctime->value;
     } else
       buf += sprintf (buf, ". ");
 
-    if (element_log[row_current - 13].queue_level != data->queue_level) {
+    if (element_log[row_current - log_base_row].queue_level !=
+        data->queue_level) {
       buf += sprintf (buf, "%d ", data->queue_level);
-      element_log[row_current - 13].queue_level = data->queue_level;
+      element_log[row_current - log_base_row].queue_level = data->queue_level;
     } else
       buf += sprintf (buf, ". ");
 
-    if (element_log[row_current - 13].max_queue_level != data->max_queue_level) {
+    if (element_log[row_current - log_base_row].max_queue_level !=
+        data->max_queue_level) {
       buf += sprintf (buf, "%d", data->max_queue_level);
-      element_log[row_current - 13].max_queue_level = data->max_queue_level;
+      element_log[row_current - log_base_row].max_queue_level =
+          data->max_queue_level;
     } else
       buf += sprintf (buf, ".");
 
@@ -176,7 +184,8 @@ print_element (gpointer key, gpointer value, gpointer user_data)
 
     if (strcmp (element_log_text, ". . .")) {
       char changed_data[100];
-      sprintf (changed_data, "%d %s", row_current - 13, element_log_text);
+      sprintf (changed_data, "%d %s", row_current - log_base_row,
+          element_log_text);
 
       do_print_log ("log", changed_data);
     }
@@ -471,6 +480,7 @@ curses_loop (void *arg)
   initialize ();
 
   if (g_getenv ("LOG_ENABLED")) {
+    log_base_row = packet->cpu_num + 5;
     gettimeofday (&startTime, NULL);
     text = (char *) g_malloc (30 * sizeof (char));
     sprintf (text, "%ld.%ld", startTime.tv_sec, startTime.tv_usec / 1000);
