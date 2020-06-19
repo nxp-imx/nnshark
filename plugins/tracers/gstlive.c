@@ -132,8 +132,7 @@ do_pad_push_pre (GstTracer * self, guint64 ts, GstPad * pad, GstBuffer * buffer)
     do_print_log (file_name, text);
   }
 
-  element_push_buffer_pre (element_name, pad_name, ts,
-      gst_buffer_get_size (buffer));
+  element_push_buffer_pre (element_name, pad_name, ts, buffer);
 }
 
 static void
