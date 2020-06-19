@@ -28,6 +28,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include "gstdot.h"
+#include "gstctf.h"
 
 static gboolean
 mock_render (const gchar * dot_string, gpointer user_data)

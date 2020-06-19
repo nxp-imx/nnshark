@@ -23,6 +23,7 @@ extern int element_width;
 extern int element_height;
 extern int arrow_width;
 extern int row_current;
+extern int log_base_row;
 extern int print_yloc;
 extern int print_xloc;
 extern int row_pad_src;
@@ -65,10 +66,11 @@ GST_END_TEST;
 
 GST_START_TEST (test_draw_element)
 {
-  mvaddch_count = 0;
-  mvprintw_count = 0;
   ElementUnit *element;
   GError *e = NULL;
+  gchar target_name[5] = "asdf";
+  mvaddch_count = 0;
+  mvprintw_count = 0;
 
   element_row = 3;
   element_col = 6;
@@ -78,7 +80,7 @@ GST_START_TEST (test_draw_element)
   element = element_unit_new (gst_parse_launch ("fakesrc ! fakesink", &e));
   element->pad = g_hash_table_new (g_str_hash, g_str_equal);
   element->proctime = avg_unit_new ();
-  elementIterator = g_list_append (elementIterator, "asdf");
+  elementIterator = g_list_append (elementIterator, target_name);
   elementIterator = g_list_first (elementIterator);
   draw_element (elementIterator->data, element, NULL);
   ck_assert (mvprintw_count == 4);
@@ -89,36 +91,38 @@ GST_END_TEST;
 
 GST_START_TEST (test_print_element)
 {
-  mvprintw_count = 0;
-  attron_count = 0;
   ElementUnit *element;
   GError *e = NULL;
+  gchar self_name[5] = "asdf";
+  gchar pair_name[5] = "pair";
   element_log = (LogUnit *) malloc (sizeof (LogUnit) * 100);
   g_setenv ("LOG_ENABLED", "TRUE", TRUE);
 
-  element = element_unit_new (gst_parse_launch ("fakesrc ! fakesink", &e));
-  element->pad = g_hash_table_new (g_str_hash, g_str_equal);
-  element->proctime = avg_unit_new ();
-  elementIterator = g_list_append (elementIterator, "asdf");
+  element = element_unit_new (gst_element_factory_make ("fakesink", NULL));
+  elementIterator = NULL;
+  elementIterator = g_list_append (elementIterator, self_name);
+  elementIterator = g_list_append (elementIterator, pair_name);
   elementIterator = g_list_first (elementIterator);
-  print_element (elementIterator->data, element, NULL);
+  element_log = g_malloc0 (2 * sizeof (LogUnit));
+
+  row_current = 0;
+  log_base_row = 0;
+
+  mvprintw_count = 0;
+  attron_count = 0;
+  // g_unsetenv("LOG_ENABLED");
+  print_element (self_name, element, NULL);
   ck_assert (mvprintw_count == 2);
   ck_assert (attron_count == 2);
+  ck_assert (row_current == 1);
 
   mvprintw_count = 0;
   attron_count = 0;
-  elementIterator = g_list_first (elementIterator);
-  print_element ("diff", element, NULL);
+  // g_unsetenv("LOG_ENABLED");
+  print_element (pair_name, element, NULL);
   ck_assert (mvprintw_count == 2);
   ck_assert (attron_count == 1);
-
-  mvprintw_count = 0;
-  attron_count = 0;
-  pairElement = "pair";
-  elementIterator = g_list_first (elementIterator);
-  print_element ("pair", element, NULL);
-  ck_assert (mvprintw_count == 2);
-  ck_assert (attron_count == 1);
+  ck_assert (row_current == 2);
 }
 
 GST_END_TEST;

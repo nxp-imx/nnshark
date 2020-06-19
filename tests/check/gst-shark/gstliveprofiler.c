@@ -121,17 +121,18 @@ GST_START_TEST (test_update_proctime)
   GstElement *pipe;
   gchar *name;
   GError *e = NULL;
+  ElementUnit *element1, *element2, *element3;
   gst_ctf_init ();
 
   ck_assert (gst_liveprofiler_init ());
   pipe = gst_parse_launch ("fakesrc ! identity ! fakesink", &e);
   add_children_recursively (pipe, packet->elements);
-  ElementUnit *element1, *element2;
+
   element1 = g_hash_table_lookup (packet->elements, "fakesrc0");
   element2 = g_hash_table_lookup (packet->elements, "identity0");
-  update_proctime (element1, element2, 60);
-  ck_assert (element2->time == 60);
-  update_proctime (element2, element1, 70);
+  element3 = g_hash_table_lookup (packet->elements, "fakesink0");
+  update_proctime (element1, element2, 60, 1);
+  update_proctime (element2, element3, 70, 1);
   ck_assert (element2->proctime->avg == 10);
 }
 
@@ -232,9 +233,11 @@ GST_START_TEST (test_push_buffer_pre)
   pipe = gst_parse_launch ("fakesrc ! fakesink", &e);
   add_children_recursively (pipe, packet->elements);
   element_push_buffer_pre ("fakesrc0", "src", 10, 10);
+  element_push_buffer_pre ("fakesrc0", "src", 20, 10);
   ElementUnit *unit = g_hash_table_lookup (packet->elements, "fakesrc0");
   PadUnit *pad_src = g_hash_table_lookup (unit->pad, "src");
-  ck_assert (pad_src->buffer_size->avg == 10);
+  printf ("COMMON:!!!! %f\n", pad_src->buffer_size->avg);
+  ck_assert (pad_src->buffer_size->avg == 0);
 }
 
 GST_END_TEST;
