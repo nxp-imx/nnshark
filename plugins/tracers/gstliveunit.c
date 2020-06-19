@@ -78,6 +78,7 @@ element_unit_new (GstElement * element)
       (GDestroyNotify) pad_unit_free);
 
   e->time = 0;
+  e->time_log = g_queue_new ();
 
   e->proctime = avg_unit_new ();
   e->queue_level = 0;
@@ -148,6 +149,8 @@ pad_unit_parent (GHashTable * elements, PadUnit * target)
   return g_hash_table_lookup (elements,
       GST_OBJECT_NAME (GST_OBJECT_PARENT (target->element)));
 }
+
+
 
 /******************************************************
  * Packet-related new/free functions                  *

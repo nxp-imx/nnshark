@@ -4,6 +4,7 @@
 #include <gst/gst.h>
 
 G_BEGIN_DECLS typedef struct _AvgUnit AvgUnit;
+typedef struct _BufferUnit BufferUnit;
 typedef struct _ElementUnit ElementUnit;
 typedef struct _PadUnit PadUnit;
 typedef struct _LogUnit LogUnit;
@@ -16,12 +17,19 @@ struct _AvgUnit
   gdouble avg;
 };
 
+struct _BufferUnit
+{
+  guint64 ts;
+  guint64 offset;
+};
+
 struct _ElementUnit
 {
   GstElement *element;
   GHashTable *pad;
 
   guint64 time;
+  GQueue *time_log;
 
   AvgUnit *proctime;
   guint32 queue_level;

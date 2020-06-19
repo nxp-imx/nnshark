@@ -120,17 +120,38 @@ update_cpuusage_event (guint32 cpunum, gfloat * cpuload)
 }
 
 void
-update_proctime (ElementUnit * element, ElementUnit * peerElement, guint64 ts)
+update_proctime (ElementUnit * element, ElementUnit * peerElement, guint64 ts,
+    guint64 offset)
 {
+  BufferUnit *bUnit;
   if (peerElement->is_filter) {
-    peerElement->time = ts;
+    bUnit = g_malloc (sizeof (BufferUnit));
+    bUnit->ts = ts;
+    bUnit->offset = offset;
+    g_queue_push_head (peerElement->time_log, bUnit);
   }
 
   if (element->is_filter) {
-    if (ts - element->time > 0) {
-      avg_update_value (element->proctime, ts - element->time);
+    while (g_queue_get_length (element->time_log)) {
+      bUnit = g_queue_pop_head (element->time_log);
+      if (bUnit->offset == offset) {
+        avg_update_value (element->proctime, ts - bUnit->ts);
+        break;
+      } else if (bUnit->offset > offset) {
+        g_queue_push_tail (element->time_log, bUnit);
+        break;
+      }
     }
   }
+  // if (peerElement->is_filter) {
+  //   peerElement->time = ts;
+  // }
+
+  // if (element->is_filter) {
+  //   if (ts - element->time > 0) {
+  //     avg_update_value (element->proctime, ts - element->time);
+  //   }
+  // }
 }
 
 void
@@ -207,7 +228,7 @@ element_push_buffer_pre (gchar * elementname, gchar * padname, guint64 ts,
   pPeerElement = pad_unit_parent (elements, pPeerPad);
   g_return_if_fail (pPeerElement);
 
-  update_proctime (pElement, pPeerElement, ts);
+  update_proctime (pElement, pPeerElement, ts, buffer->offset);
   update_datatrate (pPad, pPeerPad, ts);
   update_buffer_size (pPad, pPeerPad, gst_buffer_get_size (buffer));
   update_queue_level (pElement);
