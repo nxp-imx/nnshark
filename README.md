@@ -30,15 +30,49 @@ common/gst-indent <file name>
 Set environment variable as below.
 - GST_DEBUG = "GST_TRACER:7"
 - GST_TRACERS = "live"
-- LOG_ENABLED = TRUE (if you need)
 ```console
 $ GST_DEBUG="GST_TRACER:7" GST_TRACERS="live"\
      gst-launch-1.0 videotestsrc ! videorate max-rate=15 ! fakesink
 ```
 
-## How To Use Log Visualizer
+## Log Visualizer
+### Requirement
+- python 3.x
+- plotly
+- numpy
+
+### Usage
+If you want to record log, add `LOG_ENABLED` environment like below
+```console
+$ GST_DEBUG="GST_TRACER:7" GST_TRACERS="live" LOG_ENABLED=TRUE\
+     gst-launch-1.0 videotestsrc ! videorate max-rate=15 ! fakesink
+```
+
 You should know directory which have log (default path is `/nnstreamer/bin/gstshark_<timestamp>`)
 ```
 python3 scripts/graphics/log_visualizer.py --dir=<log directory>
 ```
 It will open 3 browsers.
+
+### Description
+
+Each browser have Two graph and below one is Buffer Timeline graph.
+User can see which buffers each pad is handling at a specific time.
+
+#### (1) CPU Usage 
+
+![cpuusage](https://user-images.githubusercontent.com/44594966/85497519-07d41a80-b619-11ea-810e-6d15661206a4.png)
+
+User can check CPU usage over time.
+
+#### (2) Processing time
+
+![proctime](https://user-images.githubusercontent.com/44594966/85497520-07d41a80-b619-11ea-9880-bc135c008867.png)
+
+User can check processing time for each element.
+
+#### (3) Buffer rate
+
+![bufrate](https://user-images.githubusercontent.com/44594966/85497513-06a2ed80-b619-11ea-8bfa-c3e4c27dae3b.png)
+
+User can check buffer rate for each pad
