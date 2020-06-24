@@ -10,6 +10,10 @@ https://github.com/RidgeRun/gst-shark
 
 https://developer.ridgerun.com/wiki/index.php?title=GstShark
 
+- plotly (for Log Visualizer)
+
+https://plotly.com/
+
 ## How To Install
 - On Ubuntu x64
 ```console
