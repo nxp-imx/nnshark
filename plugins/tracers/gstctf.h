@@ -35,6 +35,7 @@ typedef enum
   QUEUE_LEVEL_EVENT_ID,
   BITRATE_EVENT_ID,
   BUFFER_EVENT_ID,
+  GPUUSAGE_EVENT_ID,
 } event_id;
 
 gchar *get_ctf_path_name (void);
