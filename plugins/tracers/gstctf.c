@@ -763,7 +763,8 @@ do_print_cpuusage_event (event_id id, guint32 cpu_num, gfloat * cpuload)
   g_mutex_unlock (&ctf_descriptor->mutex);
 }
 
-do_print_gpuusage_event (event_id id, guint32 cpu_num, gfloat * gpuload)
+void
+do_print_gpuusage_event (event_id id, guint32 gpu_num, gfloat * gpuload)
 {
   GError *error;
   guint8 *mem;
