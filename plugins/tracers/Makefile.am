@@ -3,6 +3,7 @@ lib_LTLIBRARIES = libgstshark.la
 libgstshark_la_SOURCES = \
 	gstdot.c \
 	gstcpuusagecompute.c \
+	gstgpuusagecompute.c \
 	gstproctimecompute.c \
 	gstctf.c \
 	gstparser.c \
@@ -23,6 +24,7 @@ libgstshark_la_LIBADD = \
 	$(GST_LIBS) \
 	$(GVC_LIBS) \
 	$(GIO_LIBS) \
+	-lgpuperfcnt \
 	-lpthread \
 	-lncurses
 
@@ -33,6 +35,7 @@ libgstsharktracers_la_SOURCES = \
 	gstsharktracer.c \
 	gstgraphic.c \
 	gstcpuusage.c \
+	gstgpuusage.c \
 	gstproctime.c \
 	gstinterlatency.c \
 	gstscheduletime.c \
