@@ -83,17 +83,11 @@ add_children_recursively (GstElement * element, GHashTable * table)
 }
 
 gboolean
-gst_liveprofiler_init (void)
+gst_liveprofiler_init (gint cpu_num, gint gpu_num)
 {
-  gint cpu_num;
   pthread_t thread;
 
-  if ((cpu_num = sysconf (_SC_NPROCESSORS_CONF)) == -1) {
-    GST_WARNING ("Failed to get numbers of cpus");
-    cpu_num = 1;
-  }
-
-  packet = packet_new (cpu_num);
+  packet = packet_new (cpu_num, gpu_num);
 
 #ifndef _DEBUG_TRUE
   pthread_create (&thread, NULL, curses_loop, packet);
@@ -117,6 +111,17 @@ update_cpuusage_event (guint32 cpunum, gfloat * cpuload)
   gfloat *cpu_load = packet->cpu_load;
 
   memcpy (cpu_load, cpuload, cpu_num * sizeof (gfloat));
+}
+
+void
+update_gpuusage_event (guint32 gpunum, gfloat * load, gchar ** names)
+{
+  gint num = packet->gpu_num;
+  gfloat *pload = packet->gpu_load;
+  gchar **pname = packet->gpu_name;
+
+  memcpy (pload, load, num * sizeof (gfloat));
+  memcpy (pname, names, num * sizeof (gchar *));
 }
 
 void

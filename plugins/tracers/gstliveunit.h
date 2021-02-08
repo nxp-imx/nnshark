@@ -65,7 +65,11 @@ struct _LogUnit
 struct _Packet
 {
   gint cpu_num;
+  gint gpu_num;
   gfloat *cpu_load;
+  gfloat *gpu_load;
+  gchar **gpu_name;
+
   GHashTable *elements;
   gboolean loaded;
 };
@@ -82,7 +86,7 @@ gboolean pad_unit_free (PadUnit * element);
 PadUnit *pad_unit_peer (GHashTable * elements, PadUnit * target);
 ElementUnit *pad_unit_parent (GHashTable * elements, PadUnit * target);
 
-Packet *packet_new (int cpu_num);
+Packet *packet_new (int cpu_num, int gpu_num);
 gboolean packet_free (Packet * packet);
 
 G_END_DECLS
