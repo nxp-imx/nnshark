@@ -156,11 +156,14 @@ pad_unit_parent (GHashTable * elements, PadUnit * target)
  * Packet-related new/free functions                  *
  ******************************************************/
 Packet *
-packet_new (int cpu_num)
+packet_new (int cpu_num, int gpu_num)
 {
   Packet *packet = g_malloc (sizeof (Packet));
   packet->cpu_num = cpu_num;
+  packet->gpu_num = gpu_num;
   packet->cpu_load = g_malloc0 (sizeof (gfloat) * cpu_num);
+  packet->gpu_load = g_malloc0 (sizeof (gfloat) * gpu_num);
+  packet->gpu_name = g_malloc0 (sizeof (gchar *) * gpu_num);
   packet->elements =
       g_hash_table_new_full (g_str_hash, g_str_equal, NULL,
       (GDestroyNotify) element_unit_free);
@@ -173,6 +176,8 @@ gboolean
 packet_free (Packet * packet)
 {
   g_free (packet->cpu_load);
+  g_free (packet->gpu_load);
+  g_free (packet->gpu_name);
   g_hash_table_destroy (packet->elements);
   g_free (packet);
   return TRUE;

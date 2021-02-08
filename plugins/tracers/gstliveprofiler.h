@@ -1,13 +1,15 @@
 #include <gst/gst.h>
 #include "gstliveunit.h"
 
-gboolean gst_liveprofiler_init (void);
+gboolean gst_liveprofiler_init (gint cpu_num, gint gpu_num);
 gboolean gst_liveprofiler_finalize (void);
 
 void print_element (gpointer key, gpointer value, gpointer user_data);
 void print_connection (gpointer key, gpointer value, gpointer user_data);
 
 void update_cpuusage_event (guint32 cpunum, gfloat * cpuload);
+void update_gpuusage_event (guint32 gpunum, gfloat * gpuload, gchar **names);
+
 void update_pipeline_init (GstPipeline * element);
 void update_pipeline_finalize (GstPipeline * element);
 

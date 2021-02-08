@@ -7,12 +7,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -25,10 +25,12 @@
  * A tracing module that uses the DOT libraries in order to show the pipeline executed liveally
  */
 
+#include <unistd.h>
 #include "gstlive.h"
 #include "gstdot.h"
 #include "gstctf.h"
 #include "gstcpuusagecompute.h"
+#include "gstgpuusagecompute.h"
 #include "gstperiodictracer.h"
 #include "gstliveprofiler.h"
 
@@ -46,6 +48,7 @@ struct _GstLiveTracer
 {
   GstTracer parent;
   GstCPUUsage cpu_usage;
+  GstGPUUsage gpu_usage;
   gboolean event_running;
 };
 
@@ -63,8 +66,12 @@ do_periodic (GObject * obj)
 {
   GstLiveTracer *self = GST_LIVE_TRACER (obj);
   GstCPUUsage *cpu_usage;
+  GstGPUUsage *gpu_usage;
   gfloat *cpu_load;
   gint cpu_load_len;
+  gfloat *gpu_load;
+  gint gpu_load_len;
+  gchar **gpu_names;
 
   cpu_usage = &self->cpu_usage;
 
@@ -75,6 +82,15 @@ do_periodic (GObject * obj)
   gst_cpu_usage_compute (cpu_usage);
 
   update_cpuusage_event (cpu_load_len, cpu_load);
+
+  gpu_usage = &self->gpu_usage;
+  gpu_load = GPU_USAGE_ARRAY (gpu_usage);
+  gpu_load_len = GPU_USAGE_ARRAY_LENGTH (gpu_usage);
+  gpu_names = GPU_EVENT_NAME_ARRAY (gpu_usage);
+
+  gst_gpu_usage_compute (gpu_usage);
+
+  update_gpuusage_event (gpu_load_len, gpu_load, gpu_names);
 
   return TRUE;
 }
@@ -95,6 +111,7 @@ do_element_change_state_post (GObject * self, guint64 ts,
     update_pipeline_init ((GstPipeline *) element);
     if (!tracer->event_running) {
       gst_cpu_usage_init (&(tracer->cpu_usage));
+      gst_gpu_usage_init (&(tracer->gpu_usage));
       g_timeout_add_seconds (PERIODIC_INTERVAL,
           (GSourceFunc) do_periodic, (gpointer) tracer);
       tracer->event_running = TRUE;
@@ -190,9 +207,18 @@ gst_live_tracer_finalize (GObject * obj)
 static void
 gst_live_tracer_class_init (GstLiveTracerClass * klass)
 {
+  gint cpu_num;
+  gint gpu_num;
   GObjectClass *g_obj_class = G_OBJECT_CLASS (klass);
 
-  gst_liveprofiler_init ();
+  if ((cpu_num = sysconf (_SC_NPROCESSORS_CONF)) == -1) {
+    GST_WARNING ("Failed to get numbers of cpus");
+    cpu_num = 1;
+  }
+
+  gpu_num = gst_gpu_usage_get_ngpus ();
+
+  gst_liveprofiler_init (cpu_num, gpu_num);
   g_setenv ("LIVEPROFILER_ENABLED", "TRUE", TRUE);
   g_obj_class->finalize = gst_live_tracer_finalize;
 }
@@ -202,11 +228,17 @@ gst_live_tracer_init (GstLiveTracer * self)
 {
   GstTracer *tracer = GST_TRACER (self);
   GstCPUUsage *cpu_usage;
+  GstGPUUsage *gpu_usage;
 
   cpu_usage = &self->cpu_usage;
   gst_cpu_usage_init (cpu_usage);
   cpu_usage->cpu_array_sel = FALSE;
+
+  gpu_usage = &self->gpu_usage;
+  gst_gpu_usage_init (gpu_usage);
+
   self->event_running = FALSE;
+
 
   gst_tracing_register_hook (tracer, "element-change-state-post",
       G_CALLBACK (do_element_change_state_post));
