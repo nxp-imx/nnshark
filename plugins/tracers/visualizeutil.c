@@ -41,7 +41,7 @@ int element_col = 0;
 int element_width = 0;
 int element_height = 0;
 
-// Draw location 
+// Draw location
 #define DRAW_START_ROW 1
 #define DRAW_START_COL 110
 #define DRAW_WIDTH 80
@@ -387,6 +387,8 @@ print_data (int key_in, Packet * packet)
   time_t tmp_t = time (NULL);
   struct tm tm = *localtime (&tmp_t);
   int cpu_counter;
+  int gpu_counter;
+  int row_current_tmp;
   // draw
   clear ();
   mvprintw (row_offset + row_current, 36, "key");       //for debug
@@ -404,21 +406,44 @@ print_data (int key_in, Packet * packet)
     do_print_log ("log", "t");
   }
   //CPU Usage
+  //
+#define _CPU_HEADER_OFFSET 0
+#define _GPU_HEADER_OFFSET 16
+#define _CPU_STATS_OFFSET (_CPU_HEADER_OFFSET + 8)
+#define _GPU_STATS_OFFSET (_GPU_HEADER_OFFSET + 8)
   attron (A_BOLD);
   attron (COLOR_PAIR (TITLE_PAIR));
-  mvprintw (row_offset + row_current++, col_current, "CPU Usage");
+  mvprintw (row_offset + row_current, col_current + _CPU_HEADER_OFFSET,
+      "CPU Usage");
+  mvprintw (row_offset + row_current++, col_current + _GPU_HEADER_OFFSET,
+      "GPU Usage");
   attroff (A_BOLD);
   attroff (COLOR_PAIR (TITLE_PAIR));
 
+  row_current_tmp = row_current;
   cpu_counter = 0;
+  gpu_counter = 0;
   while (cpu_counter < packet->cpu_num) {
     attron (A_BOLD);
-    mvprintw (row_offset + row_current, col_current, "CPU%2d", cpu_counter);
+    mvprintw (row_offset + row_current_tmp, col_current, "CPU%2d", cpu_counter);
     attroff (A_BOLD);
-    mvprintw (row_offset + row_current++, col_current + 7 + 4, "%3.1f%%",
-        packet->cpu_load[cpu_counter]);
+    mvprintw (row_offset + row_current_tmp++, col_current + _CPU_STATS_OFFSET,
+        "%3.1f%%", packet->cpu_load[cpu_counter]);
     cpu_counter++;
   }
+
+  row_current_tmp = row_current;
+  while (gpu_counter < packet->gpu_num) {
+    attron (A_BOLD);
+    mvprintw (row_offset + row_current_tmp, col_current + _GPU_HEADER_OFFSET,
+        "%s", packet->gpu_name[gpu_counter]);
+    attroff (A_BOLD);
+    mvprintw (row_offset + row_current_tmp++, col_current + _GPU_STATS_OFFSET,
+        "%3.1f%%", packet->gpu_load[gpu_counter]);
+    gpu_counter++;
+  }
+  row_current += MAX (packet->gpu_num, packet->cpu_num);
+
 
   if (g_getenv ("LOG_ENABLED") && cpu_log
       && cpu_log[0] != (int) (packet->cpu_load[0] * 10)) {
