@@ -46,6 +46,11 @@ plugin_init (GstPlugin * plugin)
           gst_cpu_usage_tracer_get_type ())) {
     return FALSE;
   }
+
+  if (!gst_tracer_register (plugin, "gpuusage",
+          gst_cpu_usage_tracer_get_type ())) {
+    return FALSE;
+  }
 #endif
   if (!gst_tracer_register (plugin, "graphic", gst_graphic_tracer_get_type ())) {
     return FALSE;
