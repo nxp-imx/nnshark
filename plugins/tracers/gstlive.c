@@ -31,6 +31,7 @@
 #include "gstctf.h"
 #include "gstcpuusagecompute.h"
 #include "gstgpuusagecompute.h"
+#include "gstddrusagecompute.h"
 #include "gstperiodictracer.h"
 #include "gstliveprofiler.h"
 
@@ -49,6 +50,7 @@ struct _GstLiveTracer
   GstTracer parent;
   GstCPUUsage cpu_usage;
   GstGPUUsage gpu_usage;
+  GstDDRUsage ddr_usage;
   gboolean event_running;
 };
 
@@ -73,6 +75,11 @@ do_periodic (GObject * obj)
   gint gpu_load_len;
   gchar **gpu_names;
 
+  GstDDRUsage *ddr_usage;
+  gfloat *ddr_load;
+  gint ddr_load_len;
+  gchar **ddr_names;
+
   cpu_usage = &self->cpu_usage;
 
   cpu_load = CPU_USAGE_ARRAY (cpu_usage);
@@ -91,6 +98,14 @@ do_periodic (GObject * obj)
   gst_gpu_usage_compute (gpu_usage);
 
   update_gpuusage_event (gpu_load_len, gpu_load, gpu_names);
+
+  ddr_usage = &self->ddr_usage;
+  ddr_load = DDR_USAGE_ARRAY (ddr_usage);
+  ddr_load_len = DDR_USAGE_ARRAY_LENGTH (ddr_usage);
+  ddr_names = DDR_EVENT_NAME_ARRAY (ddr_usage);
+
+  gst_ddr_usage_compute (ddr_usage);
+  update_ddrusage_event (ddr_load_len, ddr_load, ddr_names);
 
   return TRUE;
 }
@@ -112,6 +127,7 @@ do_element_change_state_post (GObject * self, guint64 ts,
     if (!tracer->event_running) {
       gst_cpu_usage_init (&(tracer->cpu_usage));
       gst_gpu_usage_init (&(tracer->gpu_usage));
+      gst_ddr_usage_init (&(tracer->ddr_usage));
       g_timeout_add_seconds (PERIODIC_INTERVAL,
           (GSourceFunc) do_periodic, (gpointer) tracer);
       tracer->event_running = TRUE;
@@ -201,6 +217,7 @@ gst_live_tracer_finalize (GObject * obj)
 {
   g_unsetenv ("LIVEPROFILER_ENABLED");
   gst_liveprofiler_finalize ();
+  gst_ddr_usage_finalize ();
   G_OBJECT_CLASS (gst_live_tracer_parent_class)->finalize (obj);
 }
 
@@ -209,6 +226,7 @@ gst_live_tracer_class_init (GstLiveTracerClass * klass)
 {
   gint cpu_num;
   gint gpu_num;
+  gint ddr_num;
   GObjectClass *g_obj_class = G_OBJECT_CLASS (klass);
 
   if ((cpu_num = sysconf (_SC_NPROCESSORS_CONF)) == -1) {
@@ -217,8 +235,9 @@ gst_live_tracer_class_init (GstLiveTracerClass * klass)
   }
 
   gpu_num = gst_gpu_usage_get_ngpus ();
+  ddr_num = gst_ddr_usage_get_nmeas ();
 
-  gst_liveprofiler_init (cpu_num, gpu_num);
+  gst_liveprofiler_init (cpu_num, gpu_num, ddr_num);
   g_setenv ("LIVEPROFILER_ENABLED", "TRUE", TRUE);
   g_obj_class->finalize = gst_live_tracer_finalize;
 }
@@ -229,6 +248,7 @@ gst_live_tracer_init (GstLiveTracer * self)
   GstTracer *tracer = GST_TRACER (self);
   GstCPUUsage *cpu_usage;
   GstGPUUsage *gpu_usage;
+  GstDDRUsage *ddr_usage;
 
   cpu_usage = &self->cpu_usage;
   gst_cpu_usage_init (cpu_usage);
@@ -236,6 +256,9 @@ gst_live_tracer_init (GstLiveTracer * self)
 
   gpu_usage = &self->gpu_usage;
   gst_gpu_usage_init (gpu_usage);
+
+  ddr_usage = &self->ddr_usage;
+  gst_ddr_usage_init (ddr_usage);
 
   self->event_running = FALSE;
 
