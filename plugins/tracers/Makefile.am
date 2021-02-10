@@ -4,6 +4,7 @@ libgstshark_la_SOURCES = \
 	gstdot.c \
 	gstcpuusagecompute.c \
 	gstgpuusagecompute.c \
+	gstddrusagecompute.c \
 	gstproctimecompute.c \
 	gstctf.c \
 	gstparser.c \
