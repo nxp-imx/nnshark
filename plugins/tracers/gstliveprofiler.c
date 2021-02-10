@@ -83,11 +83,11 @@ add_children_recursively (GstElement * element, GHashTable * table)
 }
 
 gboolean
-gst_liveprofiler_init (gint cpu_num, gint gpu_num)
+gst_liveprofiler_init (gint cpu_num, gint gpu_num, gint ddr_num)
 {
   pthread_t thread;
 
-  packet = packet_new (cpu_num, gpu_num);
+  packet = packet_new (cpu_num, gpu_num, ddr_num);
 
 #ifndef _DEBUG_TRUE
   pthread_create (&thread, NULL, curses_loop, packet);
@@ -123,6 +123,18 @@ update_gpuusage_event (guint32 gpunum, gfloat * load, gchar ** names)
   memcpy (pload, load, num * sizeof (gfloat));
   memcpy (pname, names, num * sizeof (gchar *));
 }
+
+void
+update_ddrusage_event (guint32 ddrnum, gfloat * load, gchar ** names)
+{
+  gint num = packet->ddr_num;
+  gfloat *pload = packet->ddr_load;
+  gchar **pname = packet->ddr_name;
+
+  memcpy (pload, load, num * sizeof (gfloat));
+  memcpy (pname, names, num * sizeof (gchar *));
+}
+
 
 void
 update_proctime (ElementUnit * element, ElementUnit * peerElement, guint64 ts,
