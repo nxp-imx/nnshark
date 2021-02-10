@@ -69,6 +69,10 @@ struct _Packet
   gfloat *cpu_load;
   gfloat *gpu_load;
   gchar **gpu_name;
+  /* DDR */
+  gint ddr_num;
+  gfloat *ddr_load;
+  gchar **ddr_name;
 
   GHashTable *elements;
   gboolean loaded;
@@ -86,7 +90,7 @@ gboolean pad_unit_free (PadUnit * element);
 PadUnit *pad_unit_peer (GHashTable * elements, PadUnit * target);
 ElementUnit *pad_unit_parent (GHashTable * elements, PadUnit * target);
 
-Packet *packet_new (int cpu_num, int gpu_num);
+Packet *packet_new (int cpu_num, int gpu_num, int ddr_num);
 gboolean packet_free (Packet * packet);
 
 G_END_DECLS
