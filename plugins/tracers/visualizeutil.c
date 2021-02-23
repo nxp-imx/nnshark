@@ -389,6 +389,7 @@ print_data (int key_in, Packet * packet)
   int cpu_counter;
   int gpu_counter;
   int ddr_counter;
+  int pwr_counter;
   int row_current_tmp;
   // draw
   clear ();
@@ -411,10 +412,12 @@ print_data (int key_in, Packet * packet)
 #define _CPU_HEADER_OFFSET 0
 #define _GPU_HEADER_OFFSET 16
 #define _DDR_HEADER_OFFSET 32
+#define _PWR_HEADER_OFFSET 64
 
 #define _CPU_STATS_OFFSET (_CPU_HEADER_OFFSET + 8)
 #define _GPU_STATS_OFFSET (_GPU_HEADER_OFFSET + 8)
 #define _DDR_STATS_OFFSET (_DDR_HEADER_OFFSET + 16)
+#define _PWR_STATS_OFFSET (_PWR_HEADER_OFFSET + 16)
 
   attron (A_BOLD);
   attron (COLOR_PAIR (TITLE_PAIR));
@@ -422,8 +425,10 @@ print_data (int key_in, Packet * packet)
       "CPU Usage");
   mvprintw (row_offset + row_current, col_current + _GPU_HEADER_OFFSET,
       "GPU Usage");
-  mvprintw (row_offset + row_current++, col_current + _DDR_HEADER_OFFSET,
+  mvprintw (row_offset + row_current, col_current + _DDR_HEADER_OFFSET,
       "DDR Usage");
+  mvprintw (row_offset + row_current++, col_current + _PWR_HEADER_OFFSET,
+      "PWR Measurement");
   attroff (A_BOLD);
   attroff (COLOR_PAIR (TITLE_PAIR));
 
@@ -431,6 +436,7 @@ print_data (int key_in, Packet * packet)
   cpu_counter = 0;
   gpu_counter = 0;
   ddr_counter = 0;
+  pwr_counter = 0;
   while (cpu_counter < packet->cpu_num) {
     attron (A_BOLD);
     mvprintw (row_offset + row_current_tmp, col_current, "CPU%2d", cpu_counter);
@@ -462,8 +468,19 @@ print_data (int key_in, Packet * packet)
     ddr_counter++;
   }
 
-  row_current += MAX (packet->ddr_num, MAX (packet->gpu_num, packet->cpu_num));
+  row_current_tmp = row_current;
+  while (pwr_counter < packet->pwr_num) {
+    attron (A_BOLD);
+    mvprintw (row_offset + row_current_tmp, col_current + _PWR_HEADER_OFFSET,
+        "%s", packet->pwr_name[pwr_counter]);
+    attroff (A_BOLD);
+    mvprintw (row_offset + row_current_tmp++, col_current + _PWR_STATS_OFFSET,
+        "%8.2f mW", packet->pwr_value[pwr_counter]);
+    pwr_counter++;
+  }
 
+  row_current += MAX (packet->pwr_num,
+      MAX (packet->ddr_num, MAX (packet->gpu_num, packet->cpu_num)));
 
   if (g_getenv ("LOG_ENABLED") && cpu_log
       && cpu_log[0] != (int) (packet->cpu_load[0] * 10)) {
