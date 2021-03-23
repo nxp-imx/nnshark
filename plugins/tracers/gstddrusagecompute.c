@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/utsname.h>
 
 #define SOC_NAME_MAX_LENGTH 8
 static gchar soc_name[SOC_NAME_MAX_LENGTH];
@@ -36,6 +37,7 @@ static gchar soc_name[SOC_NAME_MAX_LENGTH];
 enum soc_id
 {
   IMX8MP,
+  IMX8MP_5_4,
 };
 
 struct perf_ddr_type
@@ -43,22 +45,50 @@ struct perf_ddr_type
   const char *name;
   const char *rd_metric_name;
   float rd_metric_value;
+  float rd_scaling_unit;
   const char *wr_metric_name;
   float wr_metric_value;
+  float wr_scaling_unit;
+};
+
+#define SCALING_UNIT_B_TO_MB (1.0/ (1024.0 * 1024.0 * MEAS_INTERVAL))
+#define SCALING_UNIT_KB_TO_MB (1.0 / (1024.0 * MEAS_INTERVAL))
+
+static struct perf_ddr_type perf_ddr_imx8mp_5_4[] = {
+  {"all", "imx8mp-ddr0-all-r", 0.0f, SCALING_UNIT_B_TO_MB, "imx8mp-ddr0-all-w",
+      0.0f, SCALING_UNIT_B_TO_MB},
+  {"npu", "imx8mp-ddr0-npu-r", 0.0f, SCALING_UNIT_B_TO_MB, "imx8mp-ddr0-npu-w",
+      0.0f, SCALING_UNIT_B_TO_MB},
+  {"gpu3d", "imx8mp-ddr0-3d-r", 0.0f, SCALING_UNIT_B_TO_MB, "imx8mp-ddr0-3d-w",
+      0.0f, SCALING_UNIT_B_TO_MB},
+  {"gpu2d", "imx8mp-ddr0-2d-r", 0.0f, SCALING_UNIT_B_TO_MB, "imx8mp-ddr0-2d-w",
+      0.0f, SCALING_UNIT_B_TO_MB},
+  {"a53", "imx8mp-ddr0-a53-r", 0.0f, SCALING_UNIT_B_TO_MB, "imx8mp-ddr0-a53-w",
+      0.0f, SCALING_UNIT_B_TO_MB},
+  {"isi1", "imx8mp-ddr0-isi1-r", 0.0f, SCALING_UNIT_B_TO_MB,
+      "imx8mp-ddr0-isi1-w", 0.0f, SCALING_UNIT_B_TO_MB},
+  {0}
 };
 
 static struct perf_ddr_type perf_ddr_imx8mp[] = {
-  {"all", "imx8mp-ddr0-all-r", 0.0f, "imx8mp-ddr0-all-w", 0.0f},
-  {"npu", "imx8mp-ddr0-npu-r", 0.0f, "imx8mp-ddr0-npu-w", 0.0f},
-  {"gpu3d", "imx8mp-ddr0-3d-r", 0.0f, "imx8mp-ddr0-3d-w", 0.0f},
-  {"gpu2d", "imx8mp-ddr0-2d-r", 0.0f, "imx8mp-ddr0-2d-w", 0.0f},
-  {"a53", "imx8mp-ddr0-a53-r", 0.0f, "imx8mp-ddr0-a53-w", 0.0f},
-  {"isi1", "imx8mp-ddr0-isi1-r", 0.0f, "imx8mp-ddr0-isi1-w", 0.0f},
+  {"all", "imx8mp_ddr_read.all", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.all", 0.0f, SCALING_UNIT_KB_TO_MB},
+  {"npu", "imx8mp_ddr_read.npu", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.npu", 0.0f, SCALING_UNIT_KB_TO_MB},
+  {"gpu3d", "imx8mp_ddr_read.3d", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.3d", 0.0f, SCALING_UNIT_KB_TO_MB},
+  {"gpu2d", "imx8mp_ddr_read.2d", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.2d", 0.0f, SCALING_UNIT_KB_TO_MB},
+  {"a53", "imx8mp_ddr_read.a53", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.a53", 0.0f, SCALING_UNIT_KB_TO_MB},
+  {"isi1", "imx8mp_ddr_read.isi1", 0.0f, SCALING_UNIT_KB_TO_MB,
+      "imx8mp_ddr_write.isi1", 0.0f, SCALING_UNIT_KB_TO_MB},
   {0}
 };
 
 static struct perf_ddr_type *perf_ddr_socs[] = {
   [IMX8MP] = perf_ddr_imx8mp,
+  [IMX8MP_5_4] = perf_ddr_imx8mp_5_4,
 };
 
 static struct perf_ddr_type *perf_ddr_soc = NULL;
@@ -70,15 +100,30 @@ gtop_set_perf_ddr_soc (void)
 {
   FILE *file;
   char buf[1024];
+  struct utsname info;
   if (strlen (soc_name))
     return;
+
+
+
 
   file = fopen ("/sys/devices/soc0/soc_id", "r");
   if (file == NULL)
     return;
   if ((fgets (buf, 1024, file)) != NULL) {
     if (!strncmp (buf, "i.MX8MP", SOC_NAME_MAX_LENGTH - 1)) {
-      perf_ddr_soc = perf_ddr_socs[IMX8MP];
+      int idx = IMX8MP;
+      if (uname (&info) == -1) {
+        g_warning ("uname() returns with error\n");
+      } else {
+        if (!strncmp (info.release, "5.4.", 4))
+          idx = IMX8MP_5_4;
+        else if (!strncmp (info.release, "5.10.", 5))
+          idx = IMX8MP;
+        else
+          g_error ("Correct kernel version not found");
+      }
+      perf_ddr_soc = perf_ddr_socs[idx];
     }
     strncpy (soc_name, buf, SOC_NAME_MAX_LENGTH);
   }
@@ -110,14 +155,14 @@ cb_err_watch (GIOChannel * channel, GIOCondition cond, GstDDRUsage * usage)
   idx = cnt / 2;
   evt = &perf_ddr_soc[idx];
   fvalue = (float) atof (items[5]);
-  fvalue /= (1024 * 1024);
-  fvalue /= MEAS_INTERVAL;
 
   if (cnt % 2) {
     /* Write Value */
+    fvalue *= evt->wr_scaling_unit;
     evt->wr_metric_value = fvalue;
   } else {
     /* Read Value */
+    fvalue *= evt->rd_scaling_unit;
     evt->rd_metric_value = fvalue;
   }
 
