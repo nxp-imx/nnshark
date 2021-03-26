@@ -173,6 +173,23 @@ out:
   return (TRUE);
 }
 
+static void
+gst_kill_perf_zombie (gchar * script_path)
+{
+  GError *error = NULL;
+  gint ret;
+  const gchar *argv[] = {
+    "pkill",
+    "-f",
+    script_path,
+    NULL
+  };
+
+  g_spawn_sync (NULL, (gchar **) argv, NULL,
+      G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
+      NULL, NULL, NULL, NULL, &ret, &error);
+}
+
 static GPid
 gst_perf_spawn (GstDDRUsage * usage, gchar * script_path)
 {
@@ -181,6 +198,7 @@ gst_perf_spawn (GstDDRUsage * usage, gchar * script_path)
   GIOChannel *err_ch;
   gboolean ret;
   GError *error = NULL;
+  gchar *full_script_cmdline;
 
   const gchar *argv[] = {
     "/usr/bin/env",
@@ -188,6 +206,10 @@ gst_perf_spawn (GstDDRUsage * usage, gchar * script_path)
     script_path,
     NULL
   };
+  full_script_cmdline = g_strjoin (NULL, "bash", " ", script_path, NULL);
+
+  gst_kill_perf_zombie (full_script_cmdline);
+  g_free (full_script_cmdline);
 
   ret = g_spawn_async_with_pipes (NULL, (gchar **) argv, NULL,
       G_SPAWN_STDOUT_TO_DEV_NULL, NULL, NULL, &pid, NULL, NULL, &err, &error);
