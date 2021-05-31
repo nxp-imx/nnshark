@@ -79,7 +79,7 @@ toplevel_check $srcfile
 # aclocal
 if test -f acinclude.m4; then rm acinclude.m4; fi
 
-autoreconf --force --install || exit 1
+autoreconf --force --install --exclude=gtkdocize || exit 1
 
 test -n "$NOCONFIGURE" && {
   echo "+ skipping configure stage for package $package, as requested."
