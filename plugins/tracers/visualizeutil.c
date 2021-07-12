@@ -387,6 +387,7 @@ print_data (int key_in, Packet * packet)
   time_t tmp_t = time (NULL);
   struct tm tm = *localtime (&tmp_t);
   int cpu_counter;
+  float cpu_load;
   int gpu_counter;
   int ddr_counter;
   int pwr_counter;
@@ -437,14 +438,21 @@ print_data (int key_in, Packet * packet)
   gpu_counter = 0;
   ddr_counter = 0;
   pwr_counter = 0;
+  cpu_load = 0.0;
   while (cpu_counter < packet->cpu_num) {
     attron (A_BOLD);
     mvprintw (row_offset + row_current_tmp, col_current, "CPU%2d", cpu_counter);
     attroff (A_BOLD);
     mvprintw (row_offset + row_current_tmp++, col_current + _CPU_STATS_OFFSET,
         "%3.1f%%", packet->cpu_load[cpu_counter]);
+    cpu_load += packet->cpu_load[cpu_counter];
     cpu_counter++;
   }
+  attron (A_BOLD);
+  mvprintw (row_offset + row_current_tmp, col_current, "CPU");
+  attroff (A_BOLD);
+  mvprintw (row_offset + row_current_tmp++, col_current + _CPU_STATS_OFFSET,
+      "%3.1f%%", cpu_load);
 
   row_current_tmp = row_current;
   while (gpu_counter < packet->gpu_num) {
