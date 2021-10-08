@@ -202,7 +202,7 @@ stream {\n\
 };\n\
 \n\
 event {\n\
-    name = init;\n\
+    name = \"init\";\n\
     id = 0;\n\
     stream_id = 0;\n\
 };\n\

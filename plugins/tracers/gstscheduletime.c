@@ -55,7 +55,7 @@ G_DEFINE_TYPE_WITH_CODE (GstScheduletimeTracer, gst_scheduletime_tracer,
 static GstTracerRecord *tr_schedule;
 
 static const gchar scheduling_metadata_event[] = "event {\n\
-    name = scheduling;\n\
+    name = \"scheduling\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

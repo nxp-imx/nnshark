@@ -51,7 +51,7 @@ static GstTracerRecord *tr_cpuusage;
 
 static const gchar cpuusage_metadata_event_header[] = "\
 event {\n\
-    name = cpuusage;\n\
+    name = \"cpuusage\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n";

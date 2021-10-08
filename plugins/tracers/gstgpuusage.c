@@ -49,7 +49,7 @@ static GstTracerRecord *tr_gpuusage;
 
 static const gchar gpuusage_metadata_event_header[] = "\
 event {\n\
-    name = gpuusage;\n\
+    name = \"gpuusage\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n";
