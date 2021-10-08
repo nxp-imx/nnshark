@@ -51,7 +51,7 @@ static void gst_buffer_range_post (GObject * self, GstClockTime ts,
 static GstTracerRecord *tr_buffer;
 
 static const gchar buffer_metadata_event[] = "event {\n\
-    name = buffer;\n\
+    name = \"buffer\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

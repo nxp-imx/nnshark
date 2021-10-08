@@ -65,7 +65,7 @@ struct _GstBitrateHash
 };
 
 static const gchar bitrate_metadata_event[] = "event {\n\
-    name = bitrate;\n\
+    name = \"bitrate\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

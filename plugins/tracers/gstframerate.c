@@ -76,7 +76,7 @@ struct _GstFramerateHash
 };
 
 static const gchar framerate_metadata_event[] = "event {\n\
-    name = framerate;\n\
+    name = \"framerate\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

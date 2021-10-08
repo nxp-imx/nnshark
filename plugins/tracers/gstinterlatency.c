@@ -62,7 +62,7 @@ static GstTracerRecord *tr_interlatency;
 #endif
 
 static const gchar interlatency_metadata_event[] = "event {\n\
-    name = interlatency;\n\
+    name = \"interlatency\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

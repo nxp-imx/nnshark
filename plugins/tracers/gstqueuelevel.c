@@ -49,7 +49,7 @@ static gboolean is_queue (GstElement * element);
 static GstTracerRecord *tr_qlevel;
 
 static const gchar queue_level_metadata_event[] = "event {\n\
-    name = queuelevel;\n\
+    name = \"queuelevel\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\

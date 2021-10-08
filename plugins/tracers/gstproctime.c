@@ -52,7 +52,7 @@ G_DEFINE_TYPE_WITH_CODE (GstProcTimeTracer, gst_proc_time_tracer,
 static GstTracerRecord *tr_proc_time;
 
 static const gchar proc_time_metadata_event[] = "event {\n\
-    name = proctime;\n\
+    name = \"proctime\";\n\
     id = %d;\n\
     stream_id = %d;\n\
     fields := struct {\n\
