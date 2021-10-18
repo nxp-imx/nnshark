@@ -28,6 +28,7 @@
 #include "gstgraphic.h"
 #include "gstcpuusage.h"
 #include "gstgpuusage.h"
+#include "gstddrusage.h"
 #include "gstproctime.h"
 #include "gstinterlatency.h"
 #include "gstscheduletime.h"
@@ -50,6 +51,10 @@ plugin_init (GstPlugin * plugin)
 
   if (!gst_tracer_register (plugin, "gpuusage",
           gst_gpu_usage_tracer_get_type ())) {
+    return FALSE;
+  }
+  if (!gst_tracer_register (plugin, "ddrusage",
+          gst_ddr_usage_tracer_get_type ())) {
     return FALSE;
   }
 #endif
