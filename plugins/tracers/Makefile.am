@@ -68,6 +68,8 @@ noinst_HEADERS = \
 	gstdot.h \
 	gstcpuusage.h \
 	gstcpuusagecompute.h \
+	gstgpuusage.h \
+	gstgpuusagecompute.h \
 	gstgraphic.h \
 	gstproctime.h \
 	gstproctimecompute.h \
