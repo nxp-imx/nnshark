@@ -37,6 +37,7 @@ typedef enum
   BUFFER_EVENT_ID,
   GPUUSAGE_EVENT_ID,
   DDRUSAGE_EVENT_ID,
+  PWRUSAGE_EVENT_ID,
 } event_id;
 
 gchar *get_ctf_path_name (void);
@@ -46,6 +47,7 @@ void add_metadata_event_struct (const gchar * metadata_event);
 void do_print_cpuusage_event (event_id id, guint32 cpunum, gfloat * cpuload);
 void do_print_gpuusage_event (event_id id, guint32 gpunum, gfloat * gpuload);
 void do_print_ddrusage_event (event_id id, guint32 num, gfloat * load);
+void do_print_pwrusage_event (event_id id, guint32 num, gfloat * load);
 void do_print_proctime_event (event_id id, gchar * elementname, guint64 time);
 void do_print_framerate_event (event_id id, gchar * elementname, guint64 fps);
 void do_print_interlatency_event (event_id id,
