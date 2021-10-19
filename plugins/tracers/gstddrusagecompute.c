@@ -282,13 +282,13 @@ gst_ddr_usage_init (GstDDRUsage * usage)
     /* Read */
     meas_name = usage->event_name[i];
     usage->names[i] = meas_name;
-    snprintf (meas_name, DDR_STRING_MAX, "%s-rd", evt->name);
+    snprintf (meas_name, DDR_STRING_MAX, "%s_rd", evt->name);
     metric_pnames[i] = evt->rd_metric_name;
 
     /* Write */
     meas_name = usage->event_name[i + 1];
     usage->names[i + 1] = meas_name;
-    snprintf (meas_name, DDR_STRING_MAX, "%s-wr", evt->name);
+    snprintf (meas_name, DDR_STRING_MAX, "%s_wr", evt->name);
     metric_pnames[i + 1] = evt->wr_metric_name;
 
 
