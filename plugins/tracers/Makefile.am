@@ -39,6 +39,7 @@ libgstsharktracers_la_SOURCES = \
 	gstcpuusage.c \
 	gstgpuusage.c \
 	gstddrusage.c \
+	gstpwrusage.c \
 	gstproctime.c \
 	gstinterlatency.c \
 	gstscheduletime.c \
@@ -73,6 +74,8 @@ noinst_HEADERS = \
 	gstgpuusagecompute.h \
 	gstddrusage.h \
 	gstddrusagecompute.h \
+	gstpwrusage.h \
+	gstpwrusagecompute.h \
 	gstgraphic.h \
 	gstproctime.h \
 	gstproctimecompute.h \
