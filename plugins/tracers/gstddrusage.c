@@ -97,7 +97,7 @@ ddr_usage_thread_func (GstPeriodicTracer * tracer)
     gst_tracer_record_log (tr_ddrusage, name, ddr_load[i], ddr_load[i + 1]);
   }
 
-  do_print_ddrusage_event (DDRUSAGE_EVENT_ID, ddr_load_len, ddr_load);
+  do_print_float_array_event (DDRUSAGE_EVENT_ID, 2 * ddr_load_len, ddr_load);
 
   return TRUE;
 }

@@ -99,7 +99,7 @@ pwr_usage_thread_func (GstPeriodicTracer * tracer)
     gst_tracer_record_log (tr_pwrusage, pwr_names[pwr_id], pwr_meas[pwr_id]);
   }
 
-  do_print_pwrusage_event (PWRUSAGE_EVENT_ID, pwr_meas_len, pwr_meas);
+  do_print_float_array_event (PWRUSAGE_EVENT_ID, pwr_meas_len, pwr_meas);
 
   return TRUE;
 
