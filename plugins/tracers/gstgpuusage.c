@@ -106,7 +106,7 @@ gpu_usage_thread_func (GstPeriodicTracer * tracer)
   for (gpu_id = 0; gpu_id < gpu_load_len; ++gpu_id) {
     gst_tracer_record_log (tr_gpuusage, gpu_id, gpu_load[gpu_id]);
   }
-  do_print_gpuusage_event (GPUUSAGE_EVENT_ID, gpu_load_len, gpu_load);
+  do_print_float_array_event (GPUUSAGE_EVENT_ID, gpu_load_len, gpu_load);
 
   return TRUE;
 }

@@ -108,7 +108,7 @@ cpu_usage_thread_func (GstPeriodicTracer * tracer)
   for (cpu_id = 0; cpu_id < cpu_load_len; ++cpu_id) {
     gst_tracer_record_log (tr_cpuusage, cpu_id, cpu_load[cpu_id]);
   }
-  do_print_cpuusage_event (CPUUSAGE_EVENT_ID, cpu_load_len, cpu_load);
+  do_print_float_array_event (CPUUSAGE_EVENT_ID, cpu_load_len, cpu_load);
 
   return TRUE;
 }
