@@ -104,9 +104,6 @@ gtop_set_perf_ddr_soc (void)
   if (strlen (soc_name))
     return;
 
-
-
-
   file = fopen ("/sys/devices/soc0/soc_id", "r");
   if (file == NULL)
     return;
@@ -118,10 +115,8 @@ gtop_set_perf_ddr_soc (void)
       } else {
         if (!strncmp (info.release, "5.4.", 4))
           idx = IMX8MP_5_4;
-        else if (!strncmp (info.release, "5.10.", 5))
+        else /* 5.10 or later */
           idx = IMX8MP;
-        else
-          g_error ("Correct kernel version not found");
       }
       perf_ddr_soc = perf_ddr_socs[idx];
     }
@@ -149,8 +144,10 @@ cb_err_watch (GIOChannel * channel, GIOCondition cond, GstDDRUsage * usage)
   g_io_channel_read_line (channel, &string, &size, NULL, NULL);
   g_strstrip (string);
   items = g_strsplit (string, delim, -1);
-  if (g_strv_length (items) != 7)
+  if (g_strv_length (items) != 7) {
+    g_warning ("incorrect perf output format\n");
     goto out;
+  }
   cnt = usage->meas_count++ % usage->meas_num;
   idx = cnt / 2;
   evt = &perf_ddr_soc[idx];
