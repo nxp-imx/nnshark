@@ -3,12 +3,12 @@ NXP Software Content Register
 --------------------------------------------
 
 Package:                     nnshark.git
-Version:                     imx
+Version:                     2023.11.imx
 Outgoing License:            LGPL-2.1
 License File:                COPYING.LESSER
 Type of Content:             source
 Description and comments:    A GStreamer NNStreamer pipelines real-time profiling plugin
-Release Location:            https://github.com/nxp-imx/nnshark -b imx
+Release Location:            https://github.com/nxp-imx/nnshark -b 2023.11.imx
 Origin:                      NXP (LGPL-2.1)
                              GstShark (LGPL-2.1) - https://github.com/RidgeRun/gst-shark
 
