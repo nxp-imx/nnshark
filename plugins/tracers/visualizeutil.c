@@ -1,3 +1,11 @@
+/*
+ * Modified by NXP on February 8th, 2021
+ * Modifications Copyright 2021 NXP
+ *
+ * SPDX-License-Identifier: LGPL-2.1-only
+ * Refer to COPYING.LESSER
+ */
+
 #include <ncurses.h>
 #include <string.h>
 #include <sys/time.h>

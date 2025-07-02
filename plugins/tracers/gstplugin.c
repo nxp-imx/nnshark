@@ -1,5 +1,6 @@
 /* GstShark - A Front End for GstTracer
  * Copyright (C) 2016 RidgeRun Engineering <michael.gruner@ridgerun.com>
+ * Copyright 2021 NXP
  *
  * This file is part of GstShark.
  *

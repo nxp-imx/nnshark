@@ -1,6 +1,7 @@
 /* GStreamer
  * Copyright (C) 2013 Stefan Sauer <ensonic@users.sf.net>
  * Copyright (C) 2016 RidgeRun Engineering <carlos.rodriguez@ridgerun.com>
+ * Copyright 2021 NXP
  *
  * gstinterlatency.c: tracing module that logs processing latencies
  * stats between source and intermediate elements

@@ -6,6 +6,13 @@
 #
 # This file has been generated from common/autogen.sh.in via common/update-autogen
 
+#
+# Modified by NXP on February 8th, 2021
+# Modifications Copyright 2021 NXP
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+# Refer to COPYING.LESSER
+#
 
 test -n "$srcdir" || srcdir=`dirname "$0"`
 test -n "$srcdir" || srcdir=.
