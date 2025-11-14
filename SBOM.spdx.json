@@ -1,0 +1,63 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-11-12T07:05:40Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.20"
+  },
+  "name": "nnshark-LF_6.12.49_2.2.0",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/8bacf772-652c-43ec-9656-bf02de663255",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-8bacf772-652c-43ec-9656-bf02de663255",
+      "name": "nnshark",
+      "versionInfo": "LF_6.12.49_2.2.0",
+      "licenseConcluded": "(LGPL-2.1-or-later)",
+      "licenseDeclared": "(LGPL-2.1-or-later)",
+      "downloadLocation": "https://github.com/nxp-imx/nnshark -b lf-6.12.49-2.2.0",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-cb9a97f0-4121-4d2f-bb7a-482a59a65ea7",
+      "name": "RidgeRun/gst-shark",
+      "versionInfo": "v0.7.2",
+      "licenseConcluded": "LGPL-2.1-only",
+      "licenseDeclared": "LGPL-2.1-only",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: ridgerun",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:github/ridgerun/gst-shark@v0.7.2",
+          "referenceType": "purl"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceLocator": "e531eb4a-b901-4864-ae2b-ec6466dbeeb4",
+          "referenceType": "BlackDuck-ComponentOrigin"
+        }
+      ],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-8bacf772-652c-43ec-9656-bf02de663255"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-8bacf772-652c-43ec-9656-bf02de663255",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-package-cb9a97f0-4121-4d2f-bb7a-482a59a65ea7"
+    }
+  ]
+}
